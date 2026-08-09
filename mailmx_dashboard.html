@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MailMX Pro - Dashboard</title>
+<style>
+*{box-sizing:border-box}
+:root{
+  --bg:#030817;--card:#0b1224;--card2:#10182c;--line:#1b2941;
+  --text:#f4f7ff;--muted:#8995aa;--blue:#4b83ff;--green:#08b77c;
+  --purple:#a855f7;--yellow:#eab12c
+}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+button{font:inherit;cursor:pointer}
+.header{height:84px;border-bottom:1px solid #172139;background:#050a18;display:flex;align-items:center;padding:0 20px;gap:14px;position:sticky;top:0;z-index:10}
+.logo{width:54px;height:54px;border-radius:16px;background:linear-gradient(145deg,#4c77ff,#274bd9);display:grid;place-items:center;font-weight:900;font-size:22px;box-shadow:0 0 20px #2454dd55}
+.brand b{display:block;font-size:20px}.brand small{color:#5f8cff;font-weight:800}
+.spacer{flex:1}.nav,.logout{border:1px solid #1c3156;background:#09132b;color:#7aa8ff;border-radius:25px;padding:10px 15px}
+.logout{background:#240d1a;border-color:#54213a;color:#ff7987}
+.wrap{max-width:900px;margin:auto;padding:30px 20px 55px}
+.alert,.card{border:1px solid var(--line);background:var(--card);border-radius:20px;margin-bottom:24px;overflow:hidden}
+.alert{padding:22px;border-color:#72541b;background:linear-gradient(120deg,#1c1720,#171524)}
+.alert b{color:#ffd34e}.alert p{margin:6px 0 0;color:#ddd;font-size:14px}
+.alert .icon{float:left;width:48px;height:48px;border-radius:14px;background:#4c3517;display:grid;place-items:center;font-size:25px;margin-right:16px}
+.channel{padding:24px;border-color:#06404b;background:linear-gradient(135deg,#07172a,#0a1528)}
+.channel h3{color:#5fe5bb;margin:0 0 6px}.channel p{color:#8491a5;margin:0 0 18px}
+.btn{border:0;border-radius:15px;padding:12px 18px;color:#fff;font-weight:800;width:100%;background:linear-gradient(90deg,#08a975,#0ab882)}
+.welcome{padding:30px}.welcome h1{margin:0 0 8px;font-size:25px}.welcome h1 span{color:#5f9aff}.welcome p{color:#8e99ad;line-height:1.45;margin:0}.rate{margin-top:22px;padding:11px 15px;border:1px solid #1b3a6d;background:#0b1935;border-radius:15px;color:#e5e9f3}.rate span{color:#65a0ff}
+.balance{padding:26px;border-left:5px solid var(--green)}.label{font-size:12px;color:#8d98aa}.amount{font-size:28px;color:#25e29e;font-weight:900;margin:6px 0 18px}
+.stat{padding:28px;border-left:5px solid var(--blue);position:relative}.stat.purple{border-left-color:var(--purple)}.value{font-size:27px;font-weight:900;color:#75a8ff;margin:5px 0}.purple .value{color:#bd78ff}
+.iconbox{position:absolute;right:26px;top:30px;width:52px;height:52px;border-radius:15px;background:#102a50;display:grid;place-items:center;font-size:24px}
+.purple .iconbox{background:#29133f}
+.big-action{padding:25px}.start{background:linear-gradient(90deg,#2866eb,#4c39e8)}
+.history{padding:24px}.history h2{font-size:20px;margin:0 0 18px}.history h2 span{float:right;color:#8792a4;font-size:14px;font-weight:500}
+.table{border:1px solid #1a2740;border-radius:16px;overflow:auto;min-height:135px}
+table{width:100%;border-collapse:collapse;min-width:500px}th,td{padding:16px;text-align:left;border-bottom:1px solid #1a2740}th{color:#8d99ae;font-size:13px}td{color:#727d91}.empty{text-align:center;font-style:italic;padding:35px}
+.bottom{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);width:min(860px,calc(100% - 40px));padding:8px;background:#071022;border:1px solid #17324c;border-radius:20px;box-shadow:0 10px 40px #0008}
+@media(max-width:600px){.wrap{padding:28px 20px 100px}.brand b{font-size:18px}.brand small{font-size:11px}.nav{display:none}.header{padding:0 18px}.welcome h1{font-size:24px}.bottom{width:calc(100% - 40px)}}
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="logo">MX</div>
+  <div class="brand"><b>MailMX</b><small>PRO PLATFORM</small></div>
+  <div class="spacer"></div>
+  <button class="nav">▦ &nbsp; Dashboard</button>
+  <button class="logout" onclick="alert('Demo: tombol keluar')">Keluar</button>
+</header>
+
+<main class="wrap">
+  <section class="alert">
+    <div class="icon">◷</div>
+    <b>Informasi Jam Operasional Penarikan Saldo</b>
+    <p>⚠️ Penarikan saldo OFF pada jam 07:00 Pagi sampai jam 16:00 Sore.</p>
+  </section>
+
+  <section class="card channel">
+    <h3>▢ &nbsp; Saluran WhatsApp Resmi MailMX</h3>
+    <p>Dapatkan update harga terbaru, info bonus, dan respon cepat admin.</p>
+    <button class="btn" onclick="alert('Demo: tautan WhatsApp')">Bergabung Saluran ↗</button>
+  </section>
+
+  <section class="card welcome">
+    <h1>Selamat Datang, <span id="username">Mata Mu!</span> 👋</h1>
+    <p>Pembayaran 1×24 jam setelah close hasil. Pembayaran akan dikirim ke WhatsApp mu.</p>
+    <div class="rate"><span>Rate Saat Ini:</span> <b>Rp 4.500 – Rp 6.000 / Gmail</b></div>
+  </section>
+
+  <section class="card balance">
+    <div class="label">SALDO SAYA</div>
+    <div class="amount" id="balance">Rp 0</div>
+    <button class="btn" onclick="withdraw()">Tarik Saldo</button>
+  </section>
+
+  <section class="card stat">
+    <div class="label">EMAIL AKUN</div>
+    <div style="font-size:17px;font-weight:800;margin-top:5px">mmu779432@g...</div>
+    <div style="color:#16c78b;font-size:13px;margin-top:8px">● Terverifikasi</div>
+    <div class="iconbox">👤✓</div>
+  </section>
+
+  <section class="card stat purple">
+    <div class="label">TOTAL REFERRAL</div>
+    <div class="value" id="ref">0</div>
+    <div style="color:#7d8799;font-size:13px">Teman terdaftar</div>
+    <div class="iconbox">👥</div>
+  </section>
+
+  <section class="card big-action">
+    <button class="btn start" onclick="startGmail()">➤ &nbsp; Mulai Stor Gmail</button>
+  </section>
+
+  <section class="card history">
+    <h2>◷ &nbsp; Riwayat Pengiriman Gmail</h2>
+    <div class="table">
+      <table><thead><tr><th>TANGGAL</th><th>JUMLAH GMAIL</th><th>STATUS</th></tr></thead>
+      <tbody id="gmailHistory"><tr><td colspan="3" class="empty">Belum ada riwayat stor.</td></tr></tbody></table>
+    </div>
+  </section>
+
+  <section class="card history">
+    <h2>Riwayat Penarikan Saldo <span>↻ Refresh</span></h2>
+    <div class="table">
+      <table><thead><tr><th>TANGGAL</th><th>METODE</th><th>NOMOR TUJUAN</th></tr></thead>
+      <tbody id="withdrawHistory"><tr><td colspan="3" class="empty">Belum ada riwayat penarikan.</td></tr></tbody></table>
+    </div>
+  </section>
+</main>
+
+<div class="bottom"><button class="btn" onclick="withdraw()">Tarik Saldo</button></div>
+
+<script>
+let balance=0;
+function rupiah(n){return 'Rp '+n.toLocaleString('id-ID')}
+function startGmail(){
+  const qty=prompt('Demo: berapa Gmail yang ingin dicatat?', '1');
+  if(!qty || isNaN(qty) || Number(qty)<=0)return;
+  const q=Math.floor(Number(qty));
+  const earning=q*4500;
+  balance+=earning;
+  document.getElementById('balance').textContent=rupiah(balance);
+  const d=new Date().toLocaleDateString('id-ID');
+  document.getElementById('gmailHistory').innerHTML=
+  `<tr><td>${d}</td><td>${q}</td><td style="color:#22d99a">Tersimpan</td></tr>`;
+  alert('Demo berhasil. Saldo bertambah '+rupiah(earning));
+}
+function withdraw(){
+  if(balance<=0){alert('Saldo belum tersedia.');return}
+  const method=prompt('Metode penarikan (DANA/OVO/GoPay/Bank):');
+  if(!method)return;
+  const target=prompt('Nomor rekening/nomor tujuan:');
+  if(!target)return;
+  const d=new Date().toLocaleDateString('id-ID');
+  document.getElementById('withdrawHistory').innerHTML=
+  `<tr><td>${d}</td><td>${method}</td><td>${target}</td></tr>`;
+  alert('Permintaan penarikan demo berhasil dicatat.');
+  balance=0;document.getElementById('balance').textContent='Rp 0';
+}
+</script>
+</body>
+</html>
