@@ -213,7 +213,7 @@ button{font:inherit;border:0;cursor:pointer}
   </div>
   <div id="adminGmailPanel">
    <div id="adminGmailSummary" class="admin-summary"></div>
-   <div class="admin-scroll"><table class="admin-table"><thead><tr><th>Gmail</th><th>Penyetor</th><th>WhatsApp</th><th>Tanggal</th><th>Status</th><th>Nominal</th><th>Catatan</th><th></th></tr></thead><tbody id="adminGmailBody"></tbody></table></div>
+   <div class="admin-scroll"><table class="admin-table"><thead><tr><th>Gmail</th><th>Penyetor</th><th>WhatsApp</th><th>Tanggal</th><th>Status</th><th>Nominal</th><th>Catatan</th><th>Aksi</th></tr></thead><tbody id="adminGmailBody"></tbody></table></div>
   </div>
   <div id="adminWithdrawPanel" style="display:none">
    <div id="adminWithdrawSummary" class="admin-summary"></div>
@@ -486,55 +486,170 @@ function switchAdminTab(tab){
 }
 
 async function loadAdminGmail(){
- if(!isAdmin)return;
- setMessage("adminMessage","#8fa0b5","Memuat data Gmail...");
- const {data,error}=await supabaseClient.from("gmail_submissions").select("id,user_id,gmail,submitter_whatsapp,created_at,status,amount,reviewed_at,admin_note").order("created_at",{ascending:false});
- if(error){setMessage("adminMessage","#ff6b6b",error.message);return}
- const userIds=[...new Set((data||[]).map(x=>x.user_id).filter(Boolean))];
- let profiles=[];
- if(userIds.length){const r=await supabaseClient.from("profiles").select("id,email").in("id",userIds);if(!r.error)profiles=r.data||[]}
- const pmap=Object.fromEntries(profiles.map(p=>[p.id,p.email]));
- const rows=data||[];
- const pending=rows.filter(x=>x.status==="pending").length,accepted=rows.filter(x=>x.status==="accepted").length,rejected=rows.filter(x=>x.status==="rejected").length;
- document.getElementById("adminGmailSummary").innerHTML='<div><span class="admin-small">Menunggu</span><b class="status-pending">'+pending+'</b></div><div><span class="admin-small">Diterima</span><b class="status-accepted">'+accepted+'</b></div><div><span class="admin-small">Ditolak</span><b class="status-rejected">'+rejected+'</b></div>';
- const body=document.getElementById("adminGmailBody");
- if(!rows.length){body.innerHTML='<tr><td colspan="8" class="admin-empty">Belum ada Gmail masuk.</td></tr>';setMessage("adminMessage","#5ce2ae","Tidak ada data baru.");return}
- body.innerHTML=rows.map(r=>`<tr>
- <td><b>${safe(r.gmail)}</b><div class="admin-small">ID ${safe(r.id)}</div></td>
- <td>${safe(pmap[r.user_id]||r.user_id)}</td>
- <td>${safe(r.submitter_whatsapp||"-")}</td>
- <td>${safe(fmtDate(r.created_at))}</td>
- <td><select id="gstatus_${r.id}"><option value="pending" ${r.status==="pending"?"selected":""}>Menunggu</option><option value="accepted" ${r.status==="accepted"?"selected":""}>Diterima</option><option value="rejected" ${r.status==="rejected"?"selected":""}>Ditolak</option></select></td>
- <td><input id="gamount_${r.id}" type="number" min="0" step="0.01" value="${Number(r.amount||0)}"></td>
- <td><textarea id="gnote_${r.id}" placeholder="Catatan...">${safe(r.admin_note||"")}</textarea><div class="admin-small">${r.reviewed_at?"Diperiksa: "+safe(fmtDate(r.reviewed_at)):"Belum diperiksa"}</div></td>
- <td><button class="admin-save" onclick="simpanGmailAdmin(${Number(r.id)})">Simpan</button></td>
- </tr>`).join("");
- setMessage("adminMessage","#5ce2ae","Data Gmail berhasil dimuat.");
+  if(!isAdmin)return;
+
+  setMessage("adminMessage","#8fa0b5","Memuat data Gmail...");
+
+  const {data,error}=await supabaseClient
+    .from("gmail_submissions")
+    .select("id,user_id,gmail,submitter_whatsapp,created_at,status,amount,reviewed_at,admin_note")
+    .order("created_at",{ascending:false});
+
+  if(error){
+    setMessage("adminMessage","#ff6b6b",error.message);
+    return;
+  }
+
+  const rows=data||[];
+  const userIds=[...new Set(rows.map(x=>x.user_id).filter(Boolean))];
+  let profiles=[];
+
+  if(userIds.length){
+    const r=await supabaseClient
+      .from("profiles")
+      .select("id,email")
+      .in("id",userIds);
+
+    if(!r.error)profiles=r.data||[];
+  }
+
+  const pmap=Object.fromEntries(profiles.map(p=>[p.id,p.email]));
+
+  const isPending=s=>["pending","menunggu"].includes(String(s||"").toLowerCase());
+  const isAccepted=s=>["accepted","diterima"].includes(String(s||"").toLowerCase());
+  const isRejected=s=>["rejected","ditolak"].includes(String(s||"").toLowerCase());
+
+  const pending=rows.filter(x=>isPending(x.status)).length;
+  const accepted=rows.filter(x=>isAccepted(x.status)).length;
+  const rejected=rows.filter(x=>isRejected(x.status)).length;
+
+  document.getElementById("adminGmailSummary").innerHTML=
+    '<div><span class="admin-small">Menunggu</span><b class="status-pending">'+pending+'</b></div>'+
+    '<div><span class="admin-small">Diterima</span><b class="status-accepted">'+accepted+'</b></div>'+
+    '<div><span class="admin-small">Ditolak</span><b class="status-rejected">'+rejected+'</b></div>';
+
+  const body=document.getElementById("adminGmailBody");
+
+  if(!rows.length){
+    body.innerHTML='<tr><td colspan="8" class="admin-empty">Belum ada Gmail masuk.</td></tr>';
+    setMessage("adminMessage","#5ce2ae","Tidak ada data Gmail.");
+    return;
+  }
+
+  body.innerHTML=rows.map(r=>{
+    const pending=isPending(r.status);
+    const accepted=isAccepted(r.status);
+    const rejected=isRejected(r.status);
+
+    const created=new Date(r.created_at);
+    const readyAt=new Date(created.getTime()+24*60*60*1000);
+    const ready=Date.now()>=readyAt.getTime();
+
+    let actionHtml="";
+
+    if(pending){
+      if(ready){
+        actionHtml=
+          '<div style="display:flex;flex-direction:column;gap:7px">'+
+          '<button class="admin-save" onclick="terimaGmailAdmin('+Number(r.id)+')">✓ Terima</button>'+
+          '<button class="admin-save" style="background:#351d25;color:#ff8d98" onclick="tolakGmailAdmin('+Number(r.id)+')">✕ Tolak</button>'+
+          '</div>';
+      }else{
+        actionHtml=
+          '<div class="admin-small">Belum 24 jam</div>'+
+          '<div class="admin-small">Bisa diproses: '+safe(fmtDate(readyAt.toISOString()))+'</div>';
+      }
+    }else if(accepted){
+      actionHtml='<span class="status-accepted">✓ Sudah diterima</span>';
+    }else if(rejected){
+      actionHtml='<span class="status-rejected">✕ Sudah ditolak</span>';
+    }else{
+      actionHtml='<span class="admin-small">Status: '+safe(r.status)+'</span>';
+    }
+
+    return `<tr>
+      <td><b>${safe(r.gmail)}</b><div class="admin-small">ID ${safe(r.id)}</div></td>
+      <td>${safe(pmap[r.user_id]||r.user_id)}</td>
+      <td>${safe(r.submitter_whatsapp||"-")}</td>
+      <td>${safe(fmtDate(r.created_at))}</td>
+      <td>${pending?'<span class="status-pending">Menunggu</span>':accepted?'<span class="status-accepted">Diterima</span>':'<span class="status-rejected">Ditolak</span>'}</td>
+      <td>${rupiah(r.amount||0)}</td>
+      <td>${safe(r.admin_note||"-")}<div class="admin-small">${r.reviewed_at?"Diperiksa: "+safe(fmtDate(r.reviewed_at)):"Belum diperiksa"}</div></td>
+      <td>${actionHtml}</td>
+    </tr>`;
+  }).join("");
+
+  setMessage("adminMessage","#5ce2ae","Data Gmail berhasil dimuat.");
 }
 
-async function simpanGmailAdmin(id){
- if(!isAdmin)return;
- const status=document.getElementById("gstatus_"+id).value;
- const amount=Math.max(0,Number(document.getElementById("gamount_"+id).value||0));
- const note=document.getElementById("gnote_"+id).value.trim();
- const {data:old,error:oldError}=await supabaseClient.from("gmail_submissions").select("id,user_id,status,amount").eq("id",id).single();
- if(oldError){setMessage("adminMessage","#ff6b6b",oldError.message);return}
- const oldCredit=old.status==="accepted"?Number(old.amount||0):0;
- const newCredit=status==="accepted"?amount:0;
- const delta=newCredit-oldCredit;
- if(delta!==0){
-  const {data:profile,error:profileError}=await supabaseClient.from("profiles").select("saldo").eq("id",old.user_id).single();
-  if(profileError){setMessage("adminMessage","#ff6b6b",profileError.message);return}
-  const newSaldo=Number(profile.saldo||0)+delta;
-  if(newSaldo<0){setMessage("adminMessage","#ff6b6b","Saldo tidak boleh menjadi negatif.");return}
-  const {error:e}=await supabaseClient.from("profiles").update({saldo:newSaldo}).eq("id",old.user_id);
-  if(e){setMessage("adminMessage","#ff6b6b",e.message);return}
- }
- const {error}=await supabaseClient.from("gmail_submissions").update({status,amount,admin_note:note,reviewed_at:new Date().toISOString()}).eq("id",id);
- if(error){setMessage("adminMessage","#ff6b6b",error.message);return}
- setMessage("adminMessage","#5ce2ae","Gmail diperbarui. Saldo hanya berubah sesuai Gmail yang berstatus Diterima.");
- await loadAdminGmail();
- if(currentUser?.id===old.user_id)await loadUser();
+async function terimaGmailAdmin(id){
+  if(!isAdmin)return;
+
+  const amountText=prompt("Masukkan harga Gmail ini (contoh: 4400):","");
+  if(amountText===null)return;
+
+  const amount=Number(String(amountText).replace(/[^\d.]/g,""));
+  if(!Number.isFinite(amount)||amount<=0){
+    alert("Harga harus lebih dari 0.");
+    return;
+  }
+
+  const note=prompt("Catatan Admin (opsional):","") ?? "";
+
+  setMessage("adminMessage","#8fa0b5","Memproses Gmail...");
+
+  const {data,error}=await supabaseClient.rpc(
+    "admin_terima_gmail",
+    {
+      p_submission_id:id,
+      p_amount:amount,
+      p_admin_note:note
+    }
+  );
+
+  if(error){
+    setMessage("adminMessage","#ff6b6b",error.message);
+    return;
+  }
+
+  setMessage(
+    "adminMessage",
+    "#5ce2ae",
+    "Gmail diterima. Saldo penyetor bertambah "+rupiah(amount)+"."
+  );
+
+  await loadAdminGmail();
+  await loadUser();
+}
+
+async function tolakGmailAdmin(id){
+  if(!isAdmin)return;
+
+  const note=prompt("Alasan / catatan penolakan (opsional):","") ?? "";
+
+  setMessage("adminMessage","#8fa0b5","Menolak Gmail...");
+
+  const {data,error}=await supabaseClient.rpc(
+    "admin_tolak_gmail",
+    {
+      p_submission_id:id,
+      p_admin_note:note
+    }
+  );
+
+  if(error){
+    setMessage("adminMessage","#ff6b6b",error.message);
+    return;
+  }
+
+  setMessage(
+    "adminMessage",
+    "#5ce2ae",
+    "Gmail ditolak. Saldo penyetor tidak bertambah."
+  );
+
+  await loadAdminGmail();
+  await loadUser();
 }
 
 async function loadAdminWithdrawals(){
