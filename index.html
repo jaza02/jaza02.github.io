@@ -1,179 +1,1536 @@
+```html
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#07111f">
+
 <title>Freelance Gmail Job</title>
+
 <style>
 *{box-sizing:border-box}
-:root{
- --bg:#07111f;--surface:#0d1a2b;--surface2:#102238;--line:#20344d;
- --text:#f4f7fb;--muted:#8fa0b5;--red:#ea4335;--orange:#ff9f43;
- --green:#20c997;--blue:#5b8cff
-}
-.price-list{margin:14px 0 12px;border:1px solid var(--line);border-radius:14px;overflow:hidden}
-.price-row{display:flex;justify-content:space-between;gap:12px;padding:11px 12px;border-bottom:1px solid var(--line);font-size:13px}
-.price-row:last-child{border-bottom:0}
-.price-row span{color:var(--muted)}
-.price-row strong{color:#5ce2ae;white-space:nowrap}
 
-html{scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif;padding-bottom:88px}
-a{text-decoration:none;color:inherit}
-button{font:inherit;border:0}
+:root{
+ --bg:#07111f;
+ --surface:#0d1a2b;
+ --surface2:#102238;
+ --line:#20344d;
+ --text:#f4f7fb;
+ --muted:#8fa0b5;
+ --red:#ea4335;
+ --orange:#ff9f43;
+ --green:#20c997;
+ --blue:#5b8cff
+}
+
+html{
+ scroll-behavior:smooth
+}
+
+body{
+ margin:0;
+ background:var(--bg);
+ color:var(--text);
+ font-family:Arial,Helvetica,sans-serif;
+ padding-bottom:88px
+}
+
+a{
+ text-decoration:none;
+ color:inherit
+}
+
+button{
+ font:inherit;
+ border:0;
+ cursor:pointer
+}
+
+/* HEADER */
+
 .top{
  background:linear-gradient(135deg,#0b1728,#0a2031);
  border-bottom:1px solid var(--line);
  padding:18px max(18px,calc((100vw - 940px)/2));
 }
-.topbar{display:flex;align-items:center;gap:14px;max-width:940px;margin:auto}
-.logo{
- width:54px;height:54px;border-radius:16px;background:#fff;
- display:grid;place-items:center;flex:none;box-shadow:0 5px 16px #0005
+
+.topbar{
+ display:flex;
+ align-items:center;
+ gap:14px;
+ max-width:940px;
+ margin:auto
 }
-.envelope{width:35px;height:26px;background:var(--red);border-radius:5px;position:relative}
-.envelope:after{content:"";position:absolute;left:5px;right:5px;top:4px;height:15px;border-bottom:4px solid white;transform:skewY(-28deg)}
-.brand h1{font-size:21px;margin:0}.brand p{margin:4px 0 0;color:#ffb66b;font-size:12px;font-weight:800;letter-spacing:1.2px}
-.profile{margin-left:auto;background:#14263b;border:1px solid #29425d;border-radius:25px;padding:9px 14px;color:#cbd7e5}
-.container{width:min(940px,100%);margin:auto;padding:22px 16px}
+
+.logo{
+ width:54px;
+ height:54px;
+ border-radius:16px;
+ background:#fff;
+ display:grid;
+ place-items:center;
+ flex:none;
+ box-shadow:0 5px 16px #0005
+}
+
+.envelope{
+ width:35px;
+ height:26px;
+ background:var(--red);
+ border-radius:5px;
+ position:relative
+}
+
+.envelope:after{
+ content:"";
+ position:absolute;
+ left:5px;
+ right:5px;
+ top:4px;
+ height:15px;
+ border-bottom:4px solid white;
+ transform:skewY(-28deg)
+}
+
+.brand h1{
+ font-size:21px;
+ margin:0
+}
+
+.brand p{
+ margin:4px 0 0;
+ color:#ffb66b;
+ font-size:12px;
+ font-weight:800;
+ letter-spacing:1.2px
+}
+
+.profile{
+ margin-left:auto;
+ background:#14263b;
+ border:1px solid #29425d;
+ border-radius:25px;
+ padding:9px 14px;
+ color:#cbd7e5;
+ cursor:pointer
+}
+
+/* MAIN */
+
+.container{
+ width:min(940px,100%);
+ margin:auto;
+ padding:22px 16px
+}
+
 .hero{
  background:linear-gradient(135deg,#122b45,#0d1829);
- border:1px solid #27425e;border-radius:24px;padding:25px;
- display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center;margin-bottom:18px
+ border:1px solid #27425e;
+ border-radius:24px;
+ padding:25px;
+ display:grid;
+ grid-template-columns:1fr auto;
+ gap:20px;
+ align-items:center;
+ margin-bottom:18px
 }
-.hero h2{margin:0 0 8px;font-size:25px}.hero p{margin:0;color:var(--muted);line-height:1.5}
-.hero-badge{background:#173a35;color:#59e0ae;border:1px solid #236c58;padding:10px 14px;border-radius:14px;font-weight:800;white-space:nowrap}
-.grid{display:grid;grid-template-columns:1.25fr .75fr;gap:16px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:21px}
-.balance{background:linear-gradient(145deg,#102c35,#0d1a2b);border-color:#24584e}
-.kicker{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
-.money{font-size:38px;font-weight:900;color:#58e1ad;margin:8px 0 18px}
-.actions{display:flex;gap:10px}.btn{display:block;text-align:center;padding:12px 15px;border-radius:13px;font-weight:800;flex:1}
-.primary{background:var(--red);color:white}.secondary{background:#17304b;color:#9fc0ff;border:1px solid #294b72}
-.stats{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0}
-.stat{min-height:145px}.stat .num{font-size:29px;font-weight:900;margin-top:10px}.green{color:#5ce2ae}.blue{color:#78a1ff}.orange{color:#ffb15c}
-.task{margin-top:16px}.task-head{display:flex;justify-content:space-between;gap:12px;align-items:center}.task h3{margin:0;font-size:18px}.tag{font-size:11px;padding:6px 9px;border-radius:10px;background:#173d35;color:#62e0b1}
-.task p{color:var(--muted);font-size:14px;line-height:1.5}.progress{height:8px;background:#17273b;border-radius:9px;overflow:hidden}.bar{height:100%;width:0;background:linear-gradient(90deg,var(--red),var(--orange));border-radius:9px}
-.section-title{display:flex;justify-content:space-between;align-items:center;margin:22px 0 12px}.section-title h2{font-size:19px;margin:0}.section-title span{font-size:12px;color:var(--muted)}
-.transaction{display:flex;align-items:center;gap:13px;padding:15px 0;border-bottom:1px solid #18283c}.transaction:last-child{border-bottom:0}.tx-icon{width:42px;height:42px;border-radius:13px;background:#182c43;display:grid;place-items:center}.tx-main{flex:1}.tx-main b{display:block;font-size:14px}.tx-main small{color:var(--muted)}.tx-value{font-weight:800;color:#5ce2ae}
-.notice{display:flex;gap:13px;align-items:flex-start;background:#211b12;border-color:#5b461d}.notice-icon{width:38px;height:38px;border-radius:11px;background:#604315;display:grid;place-items:center;flex:none}.notice b{font-size:14px}.notice p{color:#b7ad9d;margin:5px 0 0;font-size:12px;line-height:1.5}
+
+.hero h2{
+ margin:0 0 8px;
+ font-size:25px
+}
+
+.hero p{
+ margin:0;
+ color:var(--muted);
+ line-height:1.5
+}
+
+.hero-badge{
+ background:#173a35;
+ color:#59e0ae;
+ border:1px solid #236c58;
+ padding:10px 14px;
+ border-radius:14px;
+ font-weight:800;
+ white-space:nowrap
+}
+
+.grid{
+ display:grid;
+ grid-template-columns:1.25fr .75fr;
+ gap:16px
+}
+
+.card{
+ background:var(--surface);
+ border:1px solid var(--line);
+ border-radius:22px;
+ padding:21px
+}
+
+.balance{
+ background:linear-gradient(145deg,#102c35,#0d1a2b);
+ border-color:#24584e
+}
+
+.kicker{
+ font-size:12px;
+ color:var(--muted);
+ text-transform:uppercase;
+ letter-spacing:1px
+}
+
+.money{
+ font-size:38px;
+ font-weight:900;
+ color:#58e1ad;
+ margin:8px 0 18px
+}
+
+.actions{
+ display:flex;
+ gap:10px
+}
+
+.btn{
+ display:block;
+ text-align:center;
+ padding:12px 15px;
+ border-radius:13px;
+ font-weight:800;
+ flex:1
+}
+
+.primary{
+ background:var(--red);
+ color:white
+}
+
+.secondary{
+ background:#17304b;
+ color:#9fc0ff;
+ border:1px solid #294b72
+}
+
+.stats{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:16px;
+ margin:16px 0
+}
+
+.stat{
+ min-height:145px
+}
+
+.stat .num{
+ font-size:29px;
+ font-weight:900;
+ margin-top:10px
+}
+
+.green{color:#5ce2ae}
+.blue{color:#78a1ff}
+.orange{color:#ffb15c}
+
+.task{
+ margin-top:16px
+}
+
+.task-head{
+ display:flex;
+ justify-content:space-between;
+ gap:12px;
+ align-items:center
+}
+
+.task h3{
+ margin:0;
+ font-size:18px
+}
+
+.tag{
+ font-size:11px;
+ padding:6px 9px;
+ border-radius:10px;
+ background:#173d35;
+ color:#62e0b1
+}
+
+.task p{
+ color:var(--muted);
+ font-size:14px;
+ line-height:1.5
+}
+
+.progress{
+ height:8px;
+ background:#17273b;
+ border-radius:9px;
+ overflow:hidden
+}
+
+.bar{
+ height:100%;
+ width:0;
+ background:linear-gradient(90deg,var(--red),var(--orange));
+ border-radius:9px;
+ transition:.3s
+}
+
+.section-title{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ margin:22px 0 12px
+}
+
+.section-title h2{
+ font-size:19px;
+ margin:0
+}
+
+.section-title span{
+ font-size:12px;
+ color:var(--muted)
+}
+
+.transaction{
+ display:flex;
+ align-items:center;
+ gap:13px;
+ padding:15px 0;
+ border-bottom:1px solid #18283c
+}
+
+.transaction:last-child{
+ border-bottom:0
+}
+
+.tx-icon{
+ width:42px;
+ height:42px;
+ border-radius:13px;
+ background:#182c43;
+ display:grid;
+ place-items:center
+}
+
+.tx-main{
+ flex:1
+}
+
+.tx-main b{
+ display:block;
+ font-size:14px
+}
+
+.tx-main small{
+ color:var(--muted)
+}
+
+.tx-value{
+ font-weight:800;
+ color:#5ce2ae
+}
+
+.notice{
+ display:flex;
+ gap:13px;
+ align-items:flex-start;
+ background:#211b12;
+ border-color:#5b461d;
+ margin-bottom:18px
+}
+
+.notice-icon{
+ width:38px;
+ height:38px;
+ border-radius:11px;
+ background:#604315;
+ display:grid;
+ place-items:center;
+ flex:none
+}
+
+.notice b{
+ font-size:14px
+}
+
+.notice p{
+ color:#b7ad9d;
+ margin:5px 0 0;
+ font-size:12px;
+ line-height:1.5
+}
+
+.price-list{
+ margin:14px 0 12px;
+ border:1px solid var(--line);
+ border-radius:14px;
+ overflow:hidden
+}
+
+.price-row{
+ display:flex;
+ justify-content:space-between;
+ gap:12px;
+ padding:11px 12px;
+ border-bottom:1px solid var(--line);
+ font-size:13px
+}
+
+.price-row:last-child{
+ border-bottom:0
+}
+
+.price-row span{
+ color:var(--muted)
+}
+
+.price-row strong{
+ color:#5ce2ae;
+ white-space:nowrap
+}
+
+/* BOTTOM NAV */
+
 .bottom-nav{
- position:fixed;z-index:50;bottom:12px;left:50%;transform:translateX(-50%);
- width:min(600px,calc(100% - 24px));display:grid;grid-template-columns:repeat(4,1fr);
- background:#0b1828ee;border:1px solid #28405a;border-radius:22px;padding:8px;
- backdrop-filter:blur(12px);box-shadow:0 10px 35px #0008
+ position:fixed;
+ z-index:50;
+ bottom:12px;
+ left:50%;
+ transform:translateX(-50%);
+ width:min(600px,calc(100% - 24px));
+ display:grid;
+ grid-template-columns:repeat(4,1fr);
+ background:#0b1828ee;
+ border:1px solid #28405a;
+ border-radius:22px;
+ padding:8px;
+ backdrop-filter:blur(12px);
+ box-shadow:0 10px 35px #0008
 }
-.bottom-nav a{text-align:center;color:#778da6;font-size:11px;padding:8px 4px;border-radius:15px}.bottom-nav a.active{background:#17304b;color:#fff}.bottom-nav i{display:block;font-style:normal;font-size:18px;margin-bottom:3px}
+
+.bottom-nav button{
+ text-align:center;
+ color:#778da6;
+ font-size:11px;
+ padding:8px 4px;
+ border-radius:15px;
+ background:transparent
+}
+
+.bottom-nav button.active{
+ background:#17304b;
+ color:#fff
+}
+
+.bottom-nav i{
+ display:block;
+ font-style:normal;
+ font-size:18px;
+ margin-bottom:3px
+}
+
+/* MODAL */
+
+.modal{
+ display:none;
+ position:fixed;
+ inset:0;
+ z-index:100;
+ background:rgba(0,0,0,.78);
+ padding:18px;
+ align-items:center;
+ justify-content:center
+}
+
+.modal-box{
+ width:min(500px,100%);
+ max-height:90vh;
+ overflow-y:auto;
+ background:#0d1a2b;
+ border:1px solid #29425d;
+ border-radius:22px;
+ padding:20px;
+ box-shadow:0 15px 50px #000
+}
+
+.modal-header{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ margin-bottom:18px
+}
+
+.modal-header h2{
+ margin:0;
+ font-size:21px
+}
+
+.close{
+ width:38px;
+ height:38px;
+ border-radius:10px;
+ background:#182c43;
+ color:#fff;
+ font-size:25px
+}
+
+.modal label{
+ display:block;
+ margin:15px 0 7px;
+ color:var(--muted);
+ font-size:13px
+}
+
+.modal input,
+.modal select{
+ width:100%;
+ padding:13px;
+ border-radius:11px;
+ border:1px solid #29425d;
+ background:#102238;
+ color:#fff;
+ outline:none
+}
+
+.modal textarea{
+ width:100%;
+ min-height:90px;
+ padding:13px;
+ border-radius:11px;
+ border:1px solid #29425d;
+ background:#102238;
+ color:#fff;
+ resize:vertical
+}
+
+.modal-submit{
+ width:100%;
+ padding:13px;
+ margin-top:18px;
+ border-radius:12px;
+ background:var(--red);
+ color:#fff;
+ font-weight:800
+}
+
+.modal-info{
+ background:#102c35;
+ border:1px solid #24584e;
+ padding:14px;
+ border-radius:12px;
+ margin-bottom:15px
+}
+
+.modal-info span{
+ color:var(--muted);
+ font-size:12px
+}
+
+.modal-info strong{
+ display:block;
+ color:#58e1ad;
+ font-size:22px;
+ margin-top:5px
+}
+
+.message{
+ text-align:center;
+ font-size:13px;
+ margin-top:12px
+}
+
+.hidden{
+ display:none!important
+}
+
+/* SECTIONS */
+
+.page-section{
+ scroll-margin-top:20px
+}
+
+/* MOBILE */
+
 @media(max-width:700px){
- .grid{grid-template-columns:1fr}.hero{grid-template-columns:1fr}.hero-badge{width:max-content}
+
+ .grid{
+  grid-template-columns:1fr
+ }
+
+ .hero{
+  grid-template-columns:1fr
+ }
+
+ .hero-badge{
+  width:max-content
+ }
+
 }
+
 @media(max-width:520px){
- .container{padding:16px 13px}.top{padding:14px}.logo{width:48px;height:48px}.envelope{width:31px;height:23px}.brand h1{font-size:18px}.profile{font-size:12px;padding:8px 11px}
- .hero{padding:20px;border-radius:20px}.hero h2{font-size:22px}.card{padding:18px;border-radius:19px}.stats{gap:12px}.stat{min-height:125px}.money{font-size:34px}
- .actions{flex-direction:column}.bottom-nav{bottom:9px}
+
+ .container{
+  padding:16px 13px
+ }
+
+ .top{
+  padding:14px
+ }
+
+ .logo{
+  width:48px;
+  height:48px
+ }
+
+ .envelope{
+  width:31px;
+  height:23px
+ }
+
+ .brand h1{
+  font-size:18px
+ }
+
+ .profile{
+  font-size:12px;
+  padding:8px 11px
+ }
+
+ .hero{
+  padding:20px;
+  border-radius:20px
+ }
+
+ .hero h2{
+  font-size:22px
+ }
+
+ .card{
+  padding:18px;
+  border-radius:19px
+ }
+
+ .stats{
+  gap:12px
+ }
+
+ .stat{
+  min-height:125px
+ }
+
+ .money{
+  font-size:34px
+ }
+
+ .actions{
+  flex-direction:column
+ }
+
+ .bottom-nav{
+  bottom:9px
+ }
+
 }
 </style>
 </head>
+
 <body>
 
+<!-- HEADER -->
 <header class="top">
+
  <div class="topbar">
-  <div class="logo"><span class="envelope"></span></div>
+
+  <div class="logo">
+   <span class="envelope"></span>
+  </div>
+
   <div class="brand">
    <h1>Freelance Gmail Job</h1>
    <p>PLATFORM TERPERCAYA</p>
   </div>
-  <div class="profile">👤 Akun</div>
+
+  <button class="profile" onclick="bukaProfil()">
+   👤 Akun
+  </button>
+
  </div>
+
 </header>
 
+
 <main class="container">
+
+<!-- BERANDA -->
+<section id="beranda" class="page-section">
+
  <section class="hero">
+
   <div>
    <h2>Halo, Mata Mu! 👋</h2>
-   <p>Kelola aktivitas, saldo, dan riwayat pekerjaanmu dari satu tempat.</p>
+
+   <p>
+    Kelola aktivitas, saldo, dan riwayat pekerjaanmu
+    dari satu tempat.
+   </p>
   </div>
-  <div class="hero-badge">● Akun aktif</div>
+
+  <div class="hero-badge">
+   ● Akun aktif
+  </div>
+
  </section>
+
 
  <section class="card notice">
+
   <div class="notice-icon">⏱</div>
+
   <div>
    <b>Informasi penarikan saldo</b>
-   <p>Penarikan saldo tersedia setiap Selasa–Sabtu, pukul 16:00–20:00. Minggu dan Senin tidak tersedia. Pastikan data tujuan sudah benar sebelum mengajukan penarikan.</p>
+
+   <p>
+    Penarikan saldo tersedia setiap Selasa–Sabtu,
+    pukul 16:00–20:00. Minggu dan Senin tidak tersedia.
+    Pastikan data tujuan sudah benar sebelum mengajukan
+    penarikan.
+   </p>
+
   </div>
+
  </section>
+
 
  <div class="grid">
+
   <div>
-   <section class="card balance">
-    <div class="kicker">Saldo tersedia</div>
-    <div class="money">Rp 0</div>
-    <div class="actions">
-     <a class="btn primary" href="#" onclick="return false">Tarik Saldo</a>
-     <a class="btn secondary" href="#" onclick="return false">Detail</a>
+
+   <!-- SALDO -->
+   <section id="saldoCard" class="card balance">
+
+    <div class="kicker">
+     Saldo tersedia
     </div>
+
+    <div class="money" id="saldoText">
+     Rp 0
+    </div>
+
+    <div class="actions">
+
+     <button
+      class="btn primary"
+      onclick="bukaTarikSaldo()">
+      Tarik Saldo
+     </button>
+
+     <button
+      class="btn secondary"
+      onclick="bukaDetail()">
+      Detail
+     </button>
+
+    </div>
+
    </section>
 
+
+   <!-- STATISTIK -->
    <div class="stats">
+
     <section class="card stat">
-     <div class="kicker">Gmail selesai</div>
-     <div class="num blue">0</div>
-     <div class="kicker" style="margin-top:8px">Tugas terselesaikan</div>
+
+     <div class="kicker">
+      Gmail selesai
+     </div>
+
+     <div class="num blue" id="gmailCount">
+      0
+     </div>
+
+     <div
+      class="kicker"
+      style="margin-top:8px">
+      Tugas terselesaikan
+     </div>
+
     </section>
+
+
     <section class="card stat">
-     <div class="kicker">Referral</div>
-     <div class="num orange">0</div>
-     <div class="kicker" style="margin-top:8px">Teman terdaftar</div>
+
+     <div class="kicker">
+      Referral
+     </div>
+
+     <div class="num orange">
+      0
+     </div>
+
+     <div
+      class="kicker"
+      style="margin-top:8px">
+      Teman terdaftar
+     </div>
+
     </section>
+
    </div>
 
+
+   <!-- MULAI PEKERJAAN -->
    <section class="card task">
-    <div class="task-head"><h3>Mulai pekerjaan</h3><span class="tag">TERSEDIA</span></div>
-    <p>Catat pekerjaan Gmail yang selesai dan pantau perkembangan aktivitasmu.</p>
-    <div class="progress"><div class="bar"></div></div>
-    <a class="btn primary" style="margin-top:16px" href="#" onclick="return false">Mulai Stor Gmail →</a>
+
+    <div class="task-head">
+
+     <h3>
+      Mulai pekerjaan
+     </h3>
+
+     <span class="tag">
+      TERSEDIA
+     </span>
+
+    </div>
+
+    <p>
+     Catat pekerjaan Gmail yang selesai dan pantau
+     perkembangan aktivitasmu.
+    </p>
+
+    <div class="progress">
+     <div
+      class="bar"
+      id="progressBar">
+     </div>
+    </div>
+
+    <button
+     class="btn primary"
+     style="margin-top:16px;width:100%"
+     onclick="bukaGmail()">
+
+     Mulai Stor Gmail →
+
+    </button>
+
    </section>
+
   </div>
 
+
+  <!-- SIDEBAR -->
   <aside>
+
    <section class="card">
-    <div class="kicker">Profil akun</div>
-    <h3 style="margin:9px 0 6px;font-size:20px">mmu779432@gmail.com</h3>
-    <div style="color:#55dda9;font-size:13px">● Terverifikasi</div>
-    <hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
-    <div class="kicker">Harga Gmail</div>
-    <strong style="display:block;margin-top:8px;font-size:20px">Rp 4.400 – Rp 6.000 / Gmail</strong>
-    <div class="price-list">
-      <div class="price-row"><span>Jumlah lebih sedikit</span><strong>Mulai Rp 4.400</strong></div>
-      <div class="price-row"><span>Jumlah menengah</span><strong>Rate menyesuaikan</strong></div>
-      <div class="price-row"><span>Jumlah lebih banyak</span><strong>Hingga Rp 6.000</strong></div>
+
+    <div class="kicker">
+     Profil akun
     </div>
-    <small style="color:var(--muted)">Harga mengikuti jumlah Gmail yang dikirim.</small>
+
+    <h3
+     style="margin:9px 0 6px;font-size:20px">
+     mmu779432@gmail.com
+    </h3>
+
+    <div style="color:#55dda9;font-size:13px">
+     ● Terverifikasi
+    </div>
+
+    <hr
+     style="border:0;border-top:1px solid var(--line);margin:18px 0">
+
+    <div class="kicker">
+     Harga Gmail
+    </div>
+
+    <strong
+     style="display:block;margin-top:8px;font-size:20px">
+     Rp 4.400 – Rp 6.000 / Gmail
+    </strong>
+
+    <div class="price-list">
+
+     <div class="price-row">
+      <span>Jumlah lebih sedikit</span>
+      <strong>Mulai Rp 4.400</strong>
+     </div>
+
+     <div class="price-row">
+      <span>Jumlah menengah</span>
+      <strong>Rate menyesuaikan</strong>
+     </div>
+
+     <div class="price-row">
+      <span>Jumlah lebih banyak</span>
+      <strong>Hingga Rp 6.000</strong>
+     </div>
+
+    </div>
+
+    <small style="color:var(--muted)">
+     Harga mengikuti jumlah Gmail yang dikirim.
+    </small>
+
    </section>
+
 
    <section class="card" style="margin-top:16px">
-    <div class="kicker">Saluran informasi</div>
-    <p style="color:var(--muted);font-size:13px;line-height:1.5">Dapatkan update dan informasi terbaru melalui WhatsApp.</p>
-    <a class="btn secondary" href="https://whatsapp.com/" target="_blank" rel="noopener">Buka WhatsApp ↗</a>
+
+    <div class="kicker">
+     Saluran informasi
+    </div>
+
+    <p
+     style="color:var(--muted);font-size:13px;line-height:1.5">
+
+     Dapatkan update dan informasi terbaru melalui WhatsApp.
+
+    </p>
+
+    <button
+     class="btn secondary"
+     style="width:100%"
+     onclick="bukaWhatsApp()">
+
+     Buka WhatsApp ↗
+
+    </button>
+
    </section>
+
   </aside>
+
  </div>
 
- <div class="section-title"><h2>Aktivitas terbaru</h2><span>Riwayat</span></div>
+
+ <!-- AKTIVITAS -->
+ <div class="section-title">
+
+  <h2>
+   Aktivitas terbaru
+  </h2>
+
+  <span>
+   Riwayat
+  </span>
+
+ </div>
+
+
  <section class="card">
-  <div class="transaction"><div class="tx-icon">✉️</div><div class="tx-main"><b>Belum ada pengiriman</b><small>Aktivitas Gmail akan muncul di sini</small></div><div class="tx-value">—</div></div>
-  <div class="transaction"><div class="tx-icon">💳</div><div class="tx-main"><b>Belum ada penarikan</b><small>Riwayat saldo masih kosong</small></div><div class="tx-value">—</div></div>
+
+  <div class="transaction">
+
+   <div class="tx-icon">
+    ✉️
+   </div>
+
+   <div class="tx-main">
+
+    <b id="gmailActivityTitle">
+     Belum ada pengiriman
+    </b>
+
+    <small id="gmailActivityText">
+     Aktivitas Gmail akan muncul di sini
+    </small>
+
+   </div>
+
+   <div class="tx-value">
+    —
+   </div>
+
+  </div>
+
+
+  <div class="transaction">
+
+   <div class="tx-icon">
+    💳
+   </div>
+
+   <div class="tx-main">
+
+    <b id="withdrawActivityTitle">
+     Belum ada penarikan
+    </b>
+
+    <small id="withdrawActivityText">
+     Riwayat saldo masih kosong
+    </small>
+
+   </div>
+
+   <div class="tx-value">
+    —
+   </div>
+
+  </div>
+
  </section>
+
+</section>
+
 </main>
 
+
+<!-- BOTTOM NAV -->
 <nav class="bottom-nav">
- <a class="active" href="#"><i>⌂</i>Beranda</a>
- <a href="#"><i>✉</i>Gmail</a>
- <a href="#"><i>Rp</i>Saldo</a>
- <a href="#"><i>●</i>Profil</a>
+
+ <button
+  id="navHome"
+  class="active"
+  onclick="keBeranda()">
+
+  <i>⌂</i>
+  Beranda
+
+ </button>
+
+
+ <button
+  id="navGmail"
+  onclick="bukaGmail()">
+
+  <i>✉</i>
+  Gmail
+
+ </button>
+
+
+ <button
+  id="navSaldo"
+  onclick="keSaldo()">
+
+  <i>Rp</i>
+  Saldo
+
+ </button>
+
+
+ <button
+  id="navProfil"
+  onclick="bukaProfil()">
+
+  <i>●</i>
+  Profil
+
+ </button>
+
 </nav>
 
-</body>
-</html>
+
+<!-- ============================= -->
+<!-- MODAL TARIK SALDO -->
+<!-- ============================= -->
+
+<div id="withdrawModal" class="modal">
+
+ <div class="modal-box">
+
+  <div class="modal-header">
+
+   <h2>
+    Tarik Saldo
+   </h2>
+
+   <button
+    class="close"
+    onclick="tutupModal('withdrawModal')">
+    ×
+   </button>
+
+  </div>
+
+
+  <div class="modal-info">
+
+   <span>
+    Saldo tersedia
+   </span>
+
+   <strong id="withdrawBalance">
+    Rp 0
+   </strong>
+
+  </div>
+
+
+  <label>
+   Jumlah penarikan
+  </label>
+
+  <input
+   type="number"
+   id="withdrawAmount"
+   placeholder="Masukkan jumlah"
+   min="1">
+
+
+  <label>
+   Metode penarikan
+  </label>
+
+  <select id="withdrawMethod">
+
+   <option value="">
+    Pilih metode
+   </option>
+
+   <option value="DANA">
+    DANA
+   </option>
+
+   <option value="ShopeePay">
+    ShopeePay
+   </option>
+
+   <option value="SeaBank">
+    SeaBank
+   </option>
+
+  </select>
+
+
+  <label>
+   Nomor / rekening tujuan
+  </label>
+
+  <input
+   type="text"
+   id="withdrawDestination"
+   placeholder="Masukkan nomor atau rekening">
+
+
+  <button
+   class="modal-submit"
+   onclick="ajukanPenarikan()">
+
+   Ajukan Penarikan
+
+  </button>
+
+
+  <div
+   id="withdrawMessage"
+   class="message">
+  </div>
+
+ </div>
+
+</div>
+
+
+<!-- ============================= -->
+<!-- MODAL DETAIL -->
+<!-- ============================= -->
+
+<div id="detailModal" class="modal">
+
+ <div class="modal-box">
+
+  <div class="modal-header">
+
+   <h2>
+    Detail Saldo
+   </h2>
+
+   <button
+    class="close"
+    onclick="tutupModal('detailModal')">
+    ×
+   </button>
+
+  </div>
+
+
+  <div class="modal-info">
+
+   <span>
+    Saldo tersedia
+   </span>
+
+   <strong id="detailSaldo">
+    Rp 0
+   </strong>
+
+  </div>
+
+
+  <div class="transaction">
+
+   <div class="tx-icon">
+    ✉️
+   </div>
+
+   <div class="tx-main">
+
+    <b>
+     Gmail selesai
+    </b>
+
+    <small>
+     Jumlah Gmail diterima
+    </small>
+
+   </div>
+
+   <div
+    class="tx-value"
+    id="detailGmail">
+    0
+   </div>
+
+  </div>
+
+
+  <div class="transaction">
+
+   <div class="tx-icon">
+    💳
+   </div>
+
+   <div class="tx-main">
+
+    <b>
+     Penarikan
+    </b>
+
+    <small>
+     Pengajuan terakhir
+    </small>
+
+   </div>
+
+   <div
+    class="tx-value"
+    id="detailWithdraw">
+    Rp 0
+   </div>
+
+  </div>
+
+ </div>
+
+</div>
+
+
+<!-- ============================= -->
+<!-- MODAL GMAIL -->
+<!-- ============================= -->
+
+<div id="gmailModal" class="modal">
+
+ <div class="modal-box">
+
+  <div class="modal-header">
+
+   <h2>
+    Stor Gmail
+   </h2>
+
+   <button
+    class="close"
+    onclick="tutupModal('gmailModal')">
+    ×
+   </button>
+
+  </div>
+
+
+  <div class="modal-info">
+
+   <span>
+    Informasi
+   </span>
+
+   <strong style="font-size:15px">
+    Masukkan alamat Gmail saja
+   </strong>
+
+  </div>
+
+
+  <label>
+   Alamat Gmail
+  </label>
+
+  <input
+   type="email"
+   id="gmailInput"
+   placeholder="contoh@gmail.com">
+
+
+  <button
+   class="modal-submit"
+   onclick="kirimGmail()">
+
+   Kirim Gmail
+
+  </button>
+
+
+  <div
+   id="gmailMessage"
+   class="message">
+  </div>
+
+ </div>
+
+</div>
+
+
+<!-- ============================= -->
+<!-- MODAL PROFIL -->
+<!-- ============================= -->
+
+<div id="profileModal" class="modal">
+
+ <div class="modal-box">
+
+  <div class="modal-header">
+
+   <h2>
+    Profil Akun
+   </h2>
+
+   <button
+    class="close"
+    onclick="tutupModal('profileModal')">
+    ×
+   </button>
+
+  </div>
+
+
+  <div class="transaction">
+
+   <div class="tx-icon">
+    👤
+   </div>
+
+   <div class="tx-main">
+
+    <b>
+     mmu779432@gmail.com
+    </b>
+
+    <small>
+     Akun terverifikasi
+    </small>
+
+   </div>
+
+  </div>
+
+
+  <div class="transaction">
+
+   <div class="tx-icon">
+    💰
+   </div>
+
+   <div class="tx-main">
+
+    <b>
+     Saldo
+    </b>
+
+    <small>
+     Saldo tersedia
+    </small>
+
+   </div>
+
+   <div
+    class="tx-value"
+    id="profileSaldo">
+    Rp 0
+   </div>
+
+  </div>
+
+ </div>
+
+</div>
+
+
+<script>
+
+/* =================================
+   DATA SEMENTARA
+================================= */
+
+let saldo = Number(
+ localStorage.getItem("saldo") || 0
+);
+
+let gmailCount = Number(
+ localStorage.getItem("gmailCount") || 0
+);
+
+let lastWithdraw = Number(
+ localStorage.getItem("lastWithdraw") || 0
+);
+
+
+/* =================================
+   FORMAT RUPIAH
+================================= */
+
+function rupiah(angka){
+
+ return "Rp " +
+ Number(angka).toLocaleString("id-ID");
+
+}
+
+
+/* =================================
+   UPDATE TAMPILAN
+================================= */
+
+function updateTampilan(){
+
+ document.getElementById("saldoText").innerText =
+  rupiah(saldo);
+
+ document.getElementById("gmailCount").innerText =
+  gmailCount;
+
+ document.getElementById("withdrawBalance").innerText =
+  rupiah(saldo);
+
+ document.getElementById("detailSaldo").innerText =
+  rupiah(saldo);
+
+ document.getElementById("profileSaldo").innerText =
+  rupiah(saldo);
+
+ document.getElementById("detailGmail").innerText =
+  gmailCount;
+
+ document.getElementById("detailWithdraw").innerText =
+  rupiah(lastWithdraw);
+
+}
+
+
+/* =================================
+   MODAL
+================================= */
+
+function bukaModal(id){
+
+ document.getElementById(id).style.display =
+  "flex";
+
+}
+
+function tutupModal(id){
+
+ document.getElementById(id).style.display =
+  "none";
+
+}
+
+
+/* =================================
+   TARIK SALDO
+================================= */
+
+function bukaTarikSaldo(){
+
+ updateTampilan();
+
+ document.getElementById("withdrawAmount").value = "";
+
+ document.getElementById("withdrawMethod").value = "";
+
+ document.getElementById("withdrawDestination").value = "";
+
+ document.getElementById("withdrawMessage").innerText = "";
+
+ bukaModal("withdrawModal");
+
+}
+
+
+function ajukanPenarikan(){
+
+ const jumlah =
+  Number(
+   document.getElementById("withdrawAmount").value
+  );
+
+ const metode =
+  document.getElementById("withdrawMethod").value;
+
+ const tujuan =
+  document.getElementById("withdrawDestination").value.trim();
+
+ const message =
+  document.getElementById("withdrawMessage");
+
+
+ if(jumlah <= 0){
+
+  message.style.color = "#ff6b6b";
+
+  message.innerText =
+   "Masukkan jumlah penarikan.";
+
+  return;
+
+ }
+
+
+ if(jumlah > saldo){
+
+  message.style.color = "#ff6b6b";
+
+  message.innerText =
+   "Saldo tidak mencukupi.";
+
+  return;
+
+ }
+
+
+ if(!metode){
+
+  message.style.color = "#ff6b6b";
+
+  message.innerText =
+   "Pilih metode penarikan.";
+
+  return;
+
+ }
+
+
+ if(!tujuan){
+
+  message.style.color = "#ff6b6b";
+
+  message.innerText =
+   "Masukkan nomor atau rekening tujuan.";
+
+  return;
+
+ }
+
+
+ /*
+   Untuk tahap sekarang pengajuan
+   hanya disimpan di browser.
+ */
+  
