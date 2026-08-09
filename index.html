@@ -81,7 +81,7 @@ button{font:inherit;border:0;cursor:pointer}
     </div>
    </section>
 
-   <div class="stats">
+   <div class="stats" id="gmailStats" style="display:none">
     <section class="card stat"><div class="kicker">Gmail selesai</div><div class="num blue" id="gmailCount">0</div><div class="kicker" style="margin-top:8px">Tugas terselesaikan</div></section>
    </div>
 
@@ -139,8 +139,6 @@ button{font:inherit;border:0;cursor:pointer}
   <label>Email</label><input type="email" id="loginEmail" placeholder="email@contoh.com">
   <label>Password</label><input type="password" id="loginPassword" placeholder="Masukkan password">
   <button class="modal-submit" onclick="login()">Masuk</button>
-  <button class="google-btn" onclick="loginGoogle()">G &nbsp; Masuk dengan Google</button>
-  <div class="google-note">Login Google asli memerlukan konfigurasi OAuth/Google Cloud. Tombol ini tidak meminta atau menyimpan password Google.</div>
   <div id="loginMessage" class="message"></div>
   <div class="auth-switch">Belum punya akun? <button onclick="tutupModal('loginModal');bukaRegister()">Daftar</button></div>
  </div>
@@ -260,13 +258,13 @@ function updateTampilan(){
  document.getElementById("detailWithdraw").textContent=rupiah(lastWithdraw);
  document.getElementById("profileSaldo").textContent=rupiah(saldo);
  document.getElementById("profileGmail").textContent=gmailCount;
- document.getElementById("waDisplay").textContent=submitterWhatsApp||"Belum ada";
 
  const bar=document.getElementById("progressBar");
  bar.style.width=Math.min(gmailCount*10,100)+"%";
 
  const badge=document.getElementById("accountBadge");
  if(currentUser){
+  document.getElementById("gmailStats").style.display="grid";
   badge.textContent="● Akun aktif";
   document.getElementById("profileEmail").textContent=currentUser.email;
   document.getElementById("profileVerified").textContent="● Akun aktif";
@@ -277,6 +275,7 @@ function updateTampilan(){
   document.getElementById("registerTopBtn").style.display="none";
   document.getElementById("logoutTopBtn").style.display="block";
  }else{
+  document.getElementById("gmailStats").style.display="none";
   badge.textContent="○ Belum masuk";
   document.getElementById("profileEmail").textContent="Belum masuk";
   document.getElementById("profileVerified").textContent="● Silakan login";
@@ -330,11 +329,6 @@ function login(){
  setTimeout(()=>tutupModal("loginModal"),500);
 }
 
-function loginGoogle(){
- const msg=document.getElementById("loginMessage");
- msg.style.color="#ffb15c";
- msg.textContent="Login Google asli belum terhubung. Diperlukan Client ID OAuth Google agar akun dapat masuk otomatis.";
-}
 
 function logout(){
  localStorage.removeItem(SESSION_KEY);
@@ -446,7 +440,7 @@ function bukaProfil(){
  updateTampilan();bukaModal("profileModal");setNav("navProfil");
 }
 
-function bukaWhatsApp(){window.open("https://whatsapp.com/","_blank","noopener")}
+function bukaWhatsApp(){window.location.href="whatsapp://channel/0029VbDHNQjDTkK7mUgohZ1n";setTimeout(function(){window.open("https://whatsapp.com/channel/0029VbDHNQjDTkK7mUgohZ1n","_blank","noopener")},1200)}
 
 function setNav(id){
  document.querySelectorAll(".bottom-nav button").forEach(b=>b.classList.remove("active"));
