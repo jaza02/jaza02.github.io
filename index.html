@@ -1532,4 +1532,267 @@ function ajukanPenarikan(){
    Untuk tahap sekarang pengajuan
    hanya disimpan di browser.
  */
-  
+
+ saldo -= jumlah;
+
+ lastWithdraw = jumlah;
+
+ localStorage.setItem(
+  "saldo",
+  saldo
+ );
+
+ localStorage.setItem(
+  "lastWithdraw",
+  lastWithdraw
+ );
+
+ updateTampilan();
+
+
+ document.getElementById(
+  "withdrawActivityTitle"
+ ).innerText =
+  "Penarikan diajukan";
+
+ document.getElementById(
+  "withdrawActivityText"
+ ).innerText =
+  metode + " • " + rupiah(jumlah);
+
+
+ message.style.color =
+  "#5ce2ae";
+
+ message.innerText =
+  "Penarikan berhasil diajukan.";
+
+}
+
+
+/* =================================
+   DETAIL
+================================= */
+
+function bukaDetail(){
+
+ updateTampilan();
+
+ bukaModal("detailModal");
+
+}
+
+
+/* =================================
+   GMAIL
+================================= */
+
+function bukaGmail(){
+
+ bukaModal("gmailModal");
+
+ setNav("navGmail");
+
+}
+
+
+function kirimGmail(){
+
+ const input =
+  document.getElementById("gmailInput");
+
+ const email =
+  input.value.trim().toLowerCase();
+
+ const message =
+  document.getElementById("gmailMessage");
+
+
+ if(!email){
+
+  message.style.color = "#ff6b6b";
+
+  message.innerText =
+   "Masukkan alamat Gmail.";
+
+  return;
+
+ }
+
+
+ /*
+   Validasi sederhana:
+   harus berakhiran @gmail.com
+ */
+
+ if(!email.endsWith("@gmail.com")){
+
+  message.style.color = "#ff6b6b";
+
+  message.innerText =
+   "Gunakan alamat Gmail yang valid.";
+
+  return;
+
+ }
+
+
+ gmailCount++;
+
+ localStorage.setItem(
+  "gmailCount",
+  gmailCount
+ );
+
+ updateTampilan();
+
+
+ document.getElementById(
+  "gmailActivityTitle"
+ ).innerText =
+  "Gmail berhasil dikirim";
+
+
+ document.getElementById(
+  "gmailActivityText"
+ ).innerText =
+  email;
+
+
+ message.style.color =
+  "#5ce2ae";
+
+ message.innerText =
+  "Gmail berhasil dicatat.";
+
+ input.value = "";
+
+}
+
+
+/* =================================
+   PROFIL
+================================= */
+
+function bukaProfil(){
+
+ updateTampilan();
+
+ bukaModal("profileModal");
+
+ setNav("navProfil");
+
+}
+
+
+/* =================================
+   WHATSAPP
+================================= */
+
+function bukaWhatsApp(){
+
+ window.open(
+  "https://whatsapp.com/",
+  "_blank"
+ );
+
+}
+
+
+/* =================================
+   NAVIGASI
+================================= */
+
+function setNav(id){
+
+ document
+  .querySelectorAll(".bottom-nav button")
+  .forEach(function(btn){
+
+   btn.classList.remove("active");
+
+  });
+
+ const tombol =
+  document.getElementById(id);
+
+ if(tombol){
+  tombol.classList.add("active");
+ }
+
+}
+
+
+function keBeranda(){
+
+ setNav("navHome");
+
+ window.scrollTo({
+  top:0,
+  behavior:"smooth"
+ });
+
+}
+
+
+function keSaldo(){
+
+ setNav("navSaldo");
+
+ document
+  .getElementById("saldoCard")
+  .scrollIntoView({
+   behavior:"smooth",
+   block:"center"
+  });
+
+}
+
+
+function tutupSemuaModal(){
+
+ document
+  .querySelectorAll(".modal")
+  .forEach(function(modal){
+
+   modal.style.display = "none";
+
+  });
+
+}
+
+
+/* =================================
+   KLIK AREA GELAP UNTUK MENUTUP
+================================= */
+
+document
+ .querySelectorAll(".modal")
+ .forEach(function(modal){
+
+  modal.addEventListener(
+   "click",
+   function(event){
+
+    if(event.target === modal){
+
+     modal.style.display = "none";
+
+    }
+
+   }
+  );
+
+ });
+
+
+/* =================================
+   LOAD DATA
+================================= */
+
+updateTampilan();
+
+</script>
+
+</body>
+</html>
