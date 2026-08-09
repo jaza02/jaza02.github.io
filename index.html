@@ -32,7 +32,7 @@ button{font:inherit;border:0;cursor:pointer}
 .bottom-nav button{text-align:center;color:#778da6;font-size:11px;padding:8px 4px;border-radius:15px;background:transparent}.bottom-nav button.active{background:#17304b;color:#fff}.bottom-nav i{display:block;font-style:normal;font-size:18px;margin-bottom:3px}
 .modal{display:none;position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.78);padding:15px;align-items:center;justify-content:center}.modal-box{width:min(540px,100%);max-height:92vh;overflow-y:auto;background:#0d1a2b;border:1px solid #29425d;border-radius:22px;padding:20px;box-shadow:0 15px 50px #000}
 .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.modal-header h2{margin:0;font-size:21px}.close{width:38px;height:38px;border-radius:10px;background:#182c43;color:#fff;font-size:25px}
-.modal label{display:block;margin:14px 0 7px;color:var(--muted);font-size:13px}.modal input,.modal select{width:100%;padding:13px;border-radius:11px;border:1px solid #29425d;background:#102238;color:#fff;outline:none}.modal-submit{width:100%;padding:13px;margin-top:18px;border-radius:12px;background:var(--red);color:#fff;font-weight:800}.message{text-align:center;font-size:13px;margin-top:12px;line-height:1.4}
+.modal label{display:block;margin:14px 0 7px;color:var(--muted);font-size:13px}.modal input,.modal select{width:100%;padding:13px;border-radius:11px;border:1px solid #29425d;background:#102238;color:#fff;outline:none}.modal-submit{width:100%;padding:13px;margin-top:18px;border-radius:12px;background:var(--red);color:#fff;font-weight:800}.google-btn{width:100%;padding:13px;margin-top:10px;border-radius:12px;background:#fff;color:#202124;font-weight:800;border:1px solid #dadce0}.google-note{font-size:11px;color:var(--muted);line-height:1.45;margin-top:9px;text-align:center}.message{text-align:center;font-size:13px;margin-top:12px;line-height:1.4}
 .gmail-list{display:flex;flex-direction:column;gap:9px;margin-top:10px}.gmail-row{display:flex;gap:8px;align-items:center}.gmail-no{width:34px;text-align:center;color:var(--muted);font-weight:800}.gmail-row input{flex:1}.remove-gmail{width:42px;height:42px;border-radius:10px;background:#351d25;color:#ff8d98}
 .add-btn{width:100%;padding:12px;border-radius:12px;background:#17304b;border:1px dashed #416487;color:#9fc0ff;font-weight:800;margin-top:10px}
 .total-box{margin-top:15px;padding:14px;border-radius:14px;background:#102c35;border:1px solid #24584e;display:flex;justify-content:space-between;align-items:center}.total-box span{color:var(--muted);font-size:13px}.total-box strong{font-size:23px;color:#58e1ad}
@@ -62,7 +62,7 @@ button{font:inherit;border:0;cursor:pointer}
 <section id="beranda">
  <section class="hero">
   <div><h2 id="sapaan">Halo! 👋</h2><p>Kelola aktivitas, saldo, dan riwayat pekerjaanmu dari satu tempat.</p></div>
-  <div class="hero-badge">● Akun aktif</div>
+  <div class="hero-badge" id="accountBadge">○ Belum masuk</div>
  </section>
 
  <section class="card notice">
@@ -140,6 +140,8 @@ button{font:inherit;border:0;cursor:pointer}
   <label>Email</label><input type="email" id="loginEmail" placeholder="email@contoh.com">
   <label>Password</label><input type="password" id="loginPassword" placeholder="Masukkan password">
   <button class="modal-submit" onclick="login()">Masuk</button>
+  <button class="google-btn" onclick="loginGoogle()">G &nbsp; Masuk dengan Google</button>
+  <div class="google-note">Login Google asli memerlukan konfigurasi OAuth/Google Cloud. Tombol ini tidak meminta atau menyimpan password Google.</div>
   <div id="loginMessage" class="message"></div>
   <div class="auth-switch">Belum punya akun? <button onclick="tutupModal('loginModal');bukaRegister()">Daftar</button></div>
  </div>
@@ -264,7 +266,9 @@ function updateTampilan(){
  const bar=document.getElementById("progressBar");
  bar.style.width=Math.min(gmailCount*10,100)+"%";
 
+ const badge=document.getElementById("accountBadge");
  if(currentUser){
+  badge.textContent="● Akun aktif";
   document.getElementById("profileEmail").textContent=currentUser.email;
   document.getElementById("profileVerified").textContent="● Akun aktif";
   document.getElementById("profileModalEmail").textContent=currentUser.email;
@@ -274,6 +278,7 @@ function updateTampilan(){
   document.getElementById("registerTopBtn").style.display="none";
   document.getElementById("logoutTopBtn").style.display="block";
  }else{
+  badge.textContent="○ Belum masuk";
   document.getElementById("profileEmail").textContent="Belum masuk";
   document.getElementById("profileVerified").textContent="● Silakan login";
   document.getElementById("profileModalEmail").textContent="Belum masuk";
@@ -324,6 +329,12 @@ function login(){
  loadUser();updateTampilan();
  msg.style.color="#5ce2ae";msg.textContent="Berhasil masuk.";
  setTimeout(()=>tutupModal("loginModal"),500);
+}
+
+function loginGoogle(){
+ const msg=document.getElementById("loginMessage");
+ msg.style.color="#ffb15c";
+ msg.textContent="Login Google asli belum terhubung. Diperlukan Client ID OAuth Google agar akun dapat masuk otomatis.";
 }
 
 function logout(){
