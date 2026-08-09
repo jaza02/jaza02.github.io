@@ -210,11 +210,20 @@ button{font:inherit;border:0;cursor:pointer}
  </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 "use strict";
 
-const USER_KEY="freelanceGmailUsers";
-const SESSION_KEY="freelanceGmailSession";
+/* =========================================================
+   SUPABASE CONFIG
+   GANTI 2 NILAI DI BAWAH INI DENGAN DATA PROJECT KAMU.
+   JANGAN masukkan Secret key / sb_secret di sini.
+   ========================================================= */
+const SUPABASE_URL = "GANTI_DENGAN_PROJECT_URL";
+const SUPABASE_PUBLISHABLE_KEY = "GANTI_DENGAN_PUBLISHABLE_KEY";
+
+const { createClient } = window.supabase;
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
 let currentUser=null;
 let saldo=0;
@@ -223,237 +232,238 @@ let lastWithdraw=0;
 let gmailHistory=[];
 let submitterWhatsApp="";
 
-function getUsers(){return JSON.parse(localStorage.getItem(USER_KEY)||"{}")}
-function saveUsers(users){localStorage.setItem(USER_KEY,JSON.stringify(users))}
 function rupiah(n){return "Rp "+Number(n||0).toLocaleString("id-ID")}
-
-function loadUser(){
- const email=localStorage.getItem(SESSION_KEY);
- const users=getUsers();
- currentUser=email&&users[email]?users[email]:null;
- if(currentUser){
-  saldo=Number(currentUser.saldo||0);
-  gmailCount=Number(currentUser.gmailCount||0);
-  lastWithdraw=Number(currentUser.lastWithdraw||0);
-  gmailHistory=currentUser.gmailHistory||[];
-  submitterWhatsApp=currentUser.whatsapp||"";
- }else{
-  saldo=0;gmailCount=0;lastWithdraw=0;gmailHistory=[];submitterWhatsApp="";
- }
-}
-
-function saveCurrentUser(){
- if(!currentUser)return;
- const users=getUsers();
- users[currentUser.email]=currentUser;
- saveUsers(users);
-}
-
-function updateTampilan(){
- document.getElementById("saldoText").textContent=rupiah(saldo);
- document.getElementById("gmailCount").textContent=gmailCount;
- document.getElementById("withdrawBalance").textContent=rupiah(saldo);
- document.getElementById("detailSaldo").textContent=rupiah(saldo);
- document.getElementById("detailGmail").textContent=gmailCount;
- document.getElementById("detailWithdraw").textContent=rupiah(lastWithdraw);
- document.getElementById("profileSaldo").textContent=rupiah(saldo);
- document.getElementById("profileGmail").textContent=gmailCount;
-
- const bar=document.getElementById("progressBar");
- bar.style.width=Math.min(gmailCount*10,100)+"%";
-
- const badge=document.getElementById("accountBadge");
- if(currentUser){
-  document.getElementById("gmailStats").style.display="grid";
-  badge.textContent="● Akun aktif";
-  document.getElementById("profileEmail").textContent=currentUser.email;
-  document.getElementById("profileVerified").textContent="● Akun aktif";
-  document.getElementById("profileModalEmail").textContent=currentUser.email;
-  document.getElementById("sapaan").textContent="Halo! 👋";
-  document.getElementById("loginStatus").textContent="● "+currentUser.email;
-  document.getElementById("loginTopBtn").style.display="none";
-  document.getElementById("registerTopBtn").style.display="none";
-  document.getElementById("logoutTopBtn").style.display="block";
- }else{
-  document.getElementById("gmailStats").style.display="none";
-  badge.textContent="○ Belum masuk";
-  document.getElementById("profileEmail").textContent="Belum masuk";
-  document.getElementById("profileVerified").textContent="● Silakan login";
-  document.getElementById("profileModalEmail").textContent="Belum masuk";
-  document.getElementById("loginStatus").textContent="";
-  document.getElementById("loginTopBtn").style.display="block";
-  document.getElementById("registerTopBtn").style.display="block";
-  document.getElementById("logoutTopBtn").style.display="none";
- }
-}
-
+function setMessage(id,color,text){const el=document.getElementById(id);if(el){el.style.color=color;el.textContent=text}}
 function bukaModal(id){document.getElementById(id).style.display="flex"}
 function tutupModal(id){document.getElementById(id).style.display="none"}
 
-function bukaLogin(){
- document.getElementById("loginMessage").textContent="";
- bukaModal("loginModal");
-}
-function bukaRegister(){
- document.getElementById("registerMessage").textContent="";
- bukaModal("registerModal");
-}
-
-function register(){
- const email=document.getElementById("registerEmail").value.trim().toLowerCase();
- const p1=document.getElementById("registerPassword").value;
- const p2=document.getElementById("registerPassword2").value;
- const msg=document.getElementById("registerMessage");
- if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){msg.style.color="#ff6b6b";msg.textContent="Masukkan email yang valid.";return}
- if(p1.length<4){msg.style.color="#ff6b6b";msg.textContent="Password minimal 4 karakter.";return}
- if(p1!==p2){msg.style.color="#ff6b6b";msg.textContent="Konfirmasi password tidak sama.";return}
- const users=getUsers();
- if(users[email]){msg.style.color="#ff6b6b";msg.textContent="Email sudah terdaftar.";return}
- users[email]={email:email,password:p1,saldo:0,gmailCount:0,lastWithdraw:0,gmailHistory:[],whatsapp:""};
- saveUsers(users);
- localStorage.setItem(SESSION_KEY,email);
- loadUser();updateTampilan();
- msg.style.color="#5ce2ae";msg.textContent="Akun berhasil dibuat.";
- setTimeout(()=>tutupModal("registerModal"),600);
+async function ensureProfile(){
+  if(!currentUser) return null;
+  const {data,error}=await supabaseClient.from("profiles").select("id,email,saldo,whatsapp").eq("id",currentUser.id).maybeSingle();
+  if(error) throw error;
+  if(data) return data;
+  const {data:created,error:insertError}=await supabaseClient.from("profiles").insert({id:currentUser.id,email:currentUser.email,saldo:0,whatsapp:""}).select("id,email,saldo,whatsapp").single();
+  if(insertError) throw insertError;
+  return created;
 }
 
-function login(){
- const email=document.getElementById("loginEmail").value.trim().toLowerCase();
- const pass=document.getElementById("loginPassword").value;
- const msg=document.getElementById("loginMessage");
- const users=getUsers();
- if(!users[email]||users[email].password!==pass){msg.style.color="#ff6b6b";msg.textContent="Email atau password salah.";return}
- localStorage.setItem(SESSION_KEY,email);
- loadUser();updateTampilan();
- msg.style.color="#5ce2ae";msg.textContent="Berhasil masuk.";
- setTimeout(()=>tutupModal("loginModal"),500);
+async function loadUser(){
+  const {data:{session},error:sessionError}=await supabaseClient.auth.getSession();
+  if(sessionError) console.error(sessionError);
+  currentUser=session?.user||null;
+  saldo=0;gmailCount=0;lastWithdraw=0;gmailHistory=[];submitterWhatsApp="";
+  if(!currentUser){updateTampilan();return}
+
+  try{
+    const profile=await ensureProfile();
+    saldo=Number(profile?.saldo||0);
+    submitterWhatsApp=profile?.whatsapp||"";
+
+    const {count:countData,error:countError}=await supabaseClient
+      .from("gmail_submissions")
+      .select("id",{count:"exact",head:true});
+    if(countError) throw countError;
+    gmailCount=Number(countData||0);
+
+    const {data:history,error:historyError}=await supabaseClient
+      .from("gmail_submissions")
+      .select("gmail,created_at")
+      .order("created_at",{ascending:false})
+      .limit(100);
+    if(historyError) throw historyError;
+    gmailHistory=history||[];
+
+    const {data:withdrawals,error:withdrawError}=await supabaseClient
+      .from("withdrawals")
+      .select("amount,method,destination,status,created_at")
+      .order("created_at",{ascending:false})
+      .limit(1);
+    if(withdrawError) throw withdrawError;
+    lastWithdraw=Number(withdrawals?.[0]?.amount||0);
+
+    updateTampilan(withdrawals?.[0]||null);
+  }catch(error){
+    console.error(error);
+    updateTampilan();
+    setMessage("loginMessage","#ff6b6b","Gagal memuat data akun: "+(error.message||"periksa pengaturan Supabase/RLS."));
+  }
 }
 
+function updateTampilan(lastWithdrawal=null){
+  document.getElementById("saldoText").textContent=rupiah(saldo);
+  document.getElementById("gmailCount").textContent=gmailCount;
+  document.getElementById("withdrawBalance").textContent=rupiah(saldo);
+  document.getElementById("detailSaldo").textContent=rupiah(saldo);
+  document.getElementById("detailGmail").textContent=gmailCount;
+  document.getElementById("detailWithdraw").textContent=rupiah(lastWithdraw);
+  document.getElementById("profileSaldo").textContent=rupiah(saldo);
+  document.getElementById("profileGmail").textContent=gmailCount;
 
-function logout(){
- localStorage.removeItem(SESSION_KEY);
- currentUser=null;loadUser();updateTampilan();
- tutupModal("profileModal");
- keBeranda();
+  const bar=document.getElementById("progressBar");
+  bar.style.width=Math.min(gmailCount*10,100)+"%";
+
+  if(lastWithdrawal){
+    document.getElementById("withdrawActivityTitle").textContent="Penarikan diajukan";
+    document.getElementById("withdrawActivityText").textContent=(lastWithdrawal.method||"")+" • "+rupiah(lastWithdrawal.amount);
+  }
+  if(gmailHistory.length){
+    document.getElementById("gmailActivityTitle").textContent=gmailCount+" Gmail tercatat";
+    document.getElementById("gmailActivityText").textContent="Data Gmail tersimpan di akun ini";
+  }
+
+  const badge=document.getElementById("accountBadge");
+  if(currentUser){
+    document.getElementById("gmailStats").style.display="grid";
+    badge.textContent="● Akun aktif";
+    document.getElementById("profileEmail").textContent=currentUser.email;
+    document.getElementById("profileVerified").textContent="● Akun aktif";
+    document.getElementById("profileModalEmail").textContent=currentUser.email;
+    document.getElementById("sapaan").textContent="Halo! 👋";
+    document.getElementById("loginStatus").textContent="● "+currentUser.email;
+    document.getElementById("loginTopBtn").style.display="none";
+    document.getElementById("registerTopBtn").style.display="none";
+    document.getElementById("logoutTopBtn").style.display="block";
+  }else{
+    document.getElementById("gmailStats").style.display="none";
+    badge.textContent="○ Belum masuk";
+    document.getElementById("profileEmail").textContent="Belum masuk";
+    document.getElementById("profileVerified").textContent="● Silakan login";
+    document.getElementById("profileModalEmail").textContent="Belum masuk";
+    document.getElementById("loginStatus").textContent="";
+    document.getElementById("loginTopBtn").style.display="block";
+    document.getElementById("registerTopBtn").style.display="block";
+    document.getElementById("logoutTopBtn").style.display="none";
+  }
+}
+
+function bukaLogin(){setMessage("loginMessage","","" );bukaModal("loginModal")}
+function bukaRegister(){setMessage("registerMessage","","" );bukaModal("registerModal")}
+
+async function register(){
+  const email=document.getElementById("registerEmail").value.trim().toLowerCase();
+  const p1=document.getElementById("registerPassword").value;
+  const p2=document.getElementById("registerPassword2").value;
+  const msg=document.getElementById("registerMessage");
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){msg.style.color="#ff6b6b";msg.textContent="Masukkan email yang valid.";return}
+  if(p1.length<6){msg.style.color="#ff6b6b";msg.textContent="Password minimal 6 karakter.";return}
+  if(p1!==p2){msg.style.color="#ff6b6b";msg.textContent="Konfirmasi password tidak sama.";return}
+  msg.style.color="#ffb15c";msg.textContent="Membuat akun...";
+  const {data,error}=await supabaseClient.auth.signUp({email,password:p1});
+  if(error){msg.style.color="#ff6b6b";msg.textContent=error.message;return}
+  if(data.session){
+    currentUser=data.user;
+    try{await ensureProfile();await loadUser();}catch(e){console.error(e)}
+    msg.style.color="#5ce2ae";msg.textContent="Akun berhasil dibuat.";
+    setTimeout(()=>tutupModal("registerModal"),700);
+  }else{
+    msg.style.color="#5ce2ae";msg.textContent="Akun berhasil dibuat. Silakan cek email untuk konfirmasi, lalu masuk.";
+  }
+}
+
+async function login(){
+  const email=document.getElementById("loginEmail").value.trim().toLowerCase();
+  const pass=document.getElementById("loginPassword").value;
+  const msg=document.getElementById("loginMessage");
+  if(!email||!pass){msg.style.color="#ff6b6b";msg.textContent="Email dan password wajib diisi.";return}
+  msg.style.color="#ffb15c";msg.textContent="Memeriksa akun...";
+  const {data,error}=await supabaseClient.auth.signInWithPassword({email,password:pass});
+  if(error){msg.style.color="#ff6b6b";msg.textContent=error.message;return}
+  currentUser=data.user;
+  try{await ensureProfile();await loadUser();}catch(e){msg.style.color="#ff6b6b";msg.textContent="Login berhasil, tetapi data akun belum dapat dimuat: "+e.message;return}
+  msg.style.color="#5ce2ae";msg.textContent="Berhasil masuk.";
+  setTimeout(()=>tutupModal("loginModal"),500);
+}
+
+async function logout(){
+  await supabaseClient.auth.signOut();
+  currentUser=null;loadUser();
+  tutupModal("profileModal");
+  keBeranda();
 }
 
 function bukaTarikSaldo(){
- if(!currentUser){bukaLogin();return}
- updateTampilan();
- document.getElementById("withdrawAmount").value="";
- document.getElementById("withdrawMethod").value="";
- document.getElementById("withdrawDestination").value="";
- document.getElementById("withdrawMessage").textContent="";
- bukaModal("withdrawModal");
+  if(!currentUser){bukaLogin();return}
+  updateTampilan();
+  document.getElementById("withdrawAmount").value="";
+  document.getElementById("withdrawMethod").value="";
+  document.getElementById("withdrawDestination").value="";
+  document.getElementById("withdrawMessage").textContent="";
+  bukaModal("withdrawModal");
 }
 
-function ajukanPenarikan(){
- const jumlah=Number(document.getElementById("withdrawAmount").value);
- const metode=document.getElementById("withdrawMethod").value;
- const tujuan=document.getElementById("withdrawDestination").value.trim();
- const msg=document.getElementById("withdrawMessage");
- if(jumlah<=0){msg.style.color="#ff6b6b";msg.textContent="Masukkan jumlah penarikan.";return}
- if(jumlah>saldo){msg.style.color="#ff6b6b";msg.textContent="Saldo tidak mencukupi.";return}
- if(!metode){msg.style.color="#ff6b6b";msg.textContent="Pilih metode penarikan.";return}
- if(!tujuan){msg.style.color="#ff6b6b";msg.textContent="Masukkan tujuan penarikan.";return}
- saldo-=jumlah;lastWithdraw=jumlah;
- currentUser.saldo=saldo;currentUser.lastWithdraw=lastWithdraw;saveCurrentUser();updateTampilan();
- document.getElementById("withdrawActivityTitle").textContent="Penarikan diajukan";
- document.getElementById("withdrawActivityText").textContent=metode+" • "+rupiah(jumlah);
- msg.style.color="#5ce2ae";msg.textContent="Penarikan berhasil diajukan.";
+async function ajukanPenarikan(){
+  const jumlah=Number(document.getElementById("withdrawAmount").value);
+  const metode=document.getElementById("withdrawMethod").value;
+  const tujuan=document.getElementById("withdrawDestination").value.trim();
+  const msg=document.getElementById("withdrawMessage");
+  if(jumlah<=0){msg.style.color="#ff6b6b";msg.textContent="Masukkan jumlah penarikan.";return}
+  if(jumlah>saldo){msg.style.color="#ff6b6b";msg.textContent="Saldo tidak mencukupi.";return}
+  if(!metode){msg.style.color="#ff6b6b";msg.textContent="Pilih metode penarikan.";return}
+  if(!tujuan){msg.style.color="#ff6b6b";msg.textContent="Masukkan tujuan penarikan.";return}
+  msg.style.color="#ffb15c";msg.textContent="Mengajukan penarikan...";
+  const {error}=await supabaseClient.rpc("request_withdrawal",{p_amount:jumlah,p_method:metode,p_destination:tujuan});
+  if(error){msg.style.color="#ff6b6b";msg.textContent=error.message;return}
+  await loadUser();
+  msg.style.color="#5ce2ae";msg.textContent="Penarikan berhasil diajukan.";
 }
 
-function bukaDetail(){
- if(!currentUser){bukaLogin();return}
- updateTampilan();bukaModal("detailModal");
-}
+function bukaDetail(){if(!currentUser){bukaLogin();return}updateTampilan();bukaModal("detailModal")}
 
 function buatBarisGmail(index,value=""){
- const row=document.createElement("div");
- row.className="gmail-row";
- row.innerHTML='<div class="gmail-no">'+index+'</div><input type="email" class="gmail-input" placeholder="alamat@gmail.com" value="'+escapeHtml(value)+'"><button class="remove-gmail" type="button" title="Hapus">×</button>';
- row.querySelector(".remove-gmail").onclick=function(){row.remove();renumberGmail()};
- row.querySelector(".gmail-input").addEventListener("input",updateSetoranTotal);
- document.getElementById("gmailList").appendChild(row);
+  const row=document.createElement("div");
+  row.className="gmail-row";
+  row.innerHTML='<div class="gmail-no">'+index+'</div><input type="email" class="gmail-input" placeholder="alamat@gmail.com"><button class="remove-gmail" type="button" title="Hapus">×</button>';
+  row.querySelector(".gmail-input").value=value;
+  row.querySelector(".remove-gmail").onclick=function(){row.remove();renumberGmail()};
+  row.querySelector(".gmail-input").addEventListener("input",updateSetoranTotal);
+  document.getElementById("gmailList").appendChild(row);
 }
-
-function escapeHtml(str){
- return String(str).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-}
-
-function renumberGmail(){
- document.querySelectorAll("#gmailList .gmail-row").forEach((row,i)=>row.querySelector(".gmail-no").textContent=i+1);
- updateSetoranTotal();
-}
-
-function updateSetoranTotal(){
- const n=document.querySelectorAll("#gmailList .gmail-row").length;
- document.getElementById("setoranTotal").textContent=n+" Gmail";
-}
-
+function renumberGmail(){document.querySelectorAll("#gmailList .gmail-row").forEach((row,i)=>row.querySelector(".gmail-no").textContent=i+1);updateSetoranTotal()}
+function updateSetoranTotal(){document.getElementById("setoranTotal").textContent=document.querySelectorAll("#gmailList .gmail-row").length+" Gmail"}
 function tambahGmail(){buatBarisGmail(document.querySelectorAll("#gmailList .gmail-row").length+1);updateSetoranTotal()}
 
 function bukaGmail(){
- if(!currentUser){bukaLogin();return}
- document.getElementById("gmailMessage").textContent="";
- const list=document.getElementById("gmailList");
- list.innerHTML="";
- buatBarisGmail(1);
- document.getElementById("submitterWhatsApp").value=submitterWhatsApp||"";
- updateSetoranTotal();
- bukaModal("gmailModal");
- setNav("navGmail");
+  if(!currentUser){bukaLogin();return}
+  setMessage("gmailMessage","","" );
+  const list=document.getElementById("gmailList");list.innerHTML="";buatBarisGmail(1);
+  document.getElementById("submitterWhatsApp").value=submitterWhatsApp||"";
+  updateSetoranTotal();bukaModal("gmailModal");setNav("navGmail");
 }
 
-function kirimSemuaGmail(){
- const inputs=[...document.querySelectorAll(".gmail-input")];
- const emails=inputs.map(i=>i.value.trim().toLowerCase()).filter(Boolean);
- const wa=document.getElementById("submitterWhatsApp").value.trim();
- const msg=document.getElementById("gmailMessage");
-
- if(emails.length===0){msg.style.color="#ff6b6b";msg.textContent="Masukkan minimal 1 Gmail.";return}
- for(const email of emails){
-  if(!/^[^\s@]+@gmail\.com$/i.test(email)){msg.style.color="#ff6b6b";msg.textContent="Ada alamat yang bukan Gmail atau formatnya salah.";return}
- }
- if(!wa){msg.style.color="#ff6b6b";msg.textContent="Masukkan kontak WhatsApp penyetor.";return}
-
- const unique=[...new Set(emails)];
- if(unique.length!==emails.length){msg.style.color="#ff6b6b";msg.textContent="Ada Gmail yang sama. Gunakan alamat yang berbeda.";return}
-
- gmailCount+=emails.length;
- submitterWhatsApp=wa;
- gmailHistory=emails.concat(gmailHistory).slice(0,100);
- currentUser.gmailCount=gmailCount;
- currentUser.whatsapp=submitterWhatsApp;
- currentUser.gmailHistory=gmailHistory;
- saveCurrentUser();
- updateTampilan();
-
- document.getElementById("gmailActivityTitle").textContent=emails.length+" Gmail berhasil dicatat";
- document.getElementById("gmailActivityText").textContent="Kontak penyetor: "+wa;
- msg.style.color="#5ce2ae";
- msg.textContent="Berhasil mencatat "+emails.length+" Gmail.";
+async function kirimSemuaGmail(){
+  const inputs=[...document.querySelectorAll(".gmail-input")];
+  const emails=inputs.map(i=>i.value.trim().toLowerCase()).filter(Boolean);
+  const wa=document.getElementById("submitterWhatsApp").value.trim();
+  const msg=document.getElementById("gmailMessage");
+  if(emails.length===0){msg.style.color="#ff6b6b";msg.textContent="Masukkan minimal 1 Gmail.";return}
+  for(const email of emails){if(!/^[^\s@]+@gmail\.com$/i.test(email)){msg.style.color="#ff6b6b";msg.textContent="Ada alamat yang bukan Gmail atau formatnya salah.";return}}
+  if(!wa){msg.style.color="#ff6b6b";msg.textContent="Masukkan kontak WhatsApp penyetor.";return}
+  const unique=[...new Set(emails)];
+  if(unique.length!==emails.length){msg.style.color="#ff6b6b";msg.textContent="Ada Gmail yang sama. Gunakan alamat yang berbeda.";return}
+  msg.style.color="#ffb15c";msg.textContent="Menyimpan Gmail...";
+  const {data,error}=await supabaseClient.rpc("submit_gmail_batch",{p_gmails:emails,p_whatsapp:wa});
+  if(error){msg.style.color="#ff6b6b";msg.textContent=error.message;return}
+  submitterWhatsApp=wa;
+  await loadUser();
+  document.getElementById("gmailActivityTitle").textContent=emails.length+" Gmail berhasil dicatat";
+  document.getElementById("gmailActivityText").textContent="Kontak penyetor: "+wa;
+  msg.style.color="#5ce2ae";msg.textContent="Berhasil mencatat "+Number(data||emails.length)+" Gmail.";
 }
 
-function bukaProfil(){
- if(!currentUser){bukaLogin();return}
- updateTampilan();bukaModal("profileModal");setNav("navProfil");
-}
-
+function bukaProfil(){if(!currentUser){bukaLogin();return}updateTampilan();bukaModal("profileModal");setNav("navProfil")}
 function bukaWhatsApp(){window.location.href="whatsapp://channel/0029VbDHNQjDTkK7mUgohZ1n";setTimeout(function(){window.open("https://whatsapp.com/channel/0029VbDHNQjDTkK7mUgohZ1n","_blank","noopener")},1200)}
-
-function setNav(id){
- document.querySelectorAll(".bottom-nav button").forEach(b=>b.classList.remove("active"));
- const b=document.getElementById(id);if(b)b.classList.add("active");
-}
+function setNav(id){document.querySelectorAll(".bottom-nav button").forEach(b=>b.classList.remove("active"));const b=document.getElementById(id);if(b)b.classList.add("active")}
 function keBeranda(){setNav("navHome");window.scrollTo({top:0,behavior:"smooth"})}
 function keSaldo(){setNav("navSaldo");document.getElementById("saldoCard").scrollIntoView({behavior:"smooth",block:"center"})}
 
-document.querySelectorAll(".modal").forEach(modal=>{
- modal.addEventListener("click",e=>{if(e.target===modal)modal.style.display="none"});
+document.querySelectorAll(".modal").forEach(modal=>{modal.addEventListener("click",e=>{if(e.target===modal)modal.style.display="none"})});
+
+supabaseClient.auth.onAuthStateChange((_event,session)=>{
+  currentUser=session?.user||null;
+  loadUser();
 });
 
-loadUser();updateTampilan();
+loadUser();
 </script>
 </body>
 </html>
