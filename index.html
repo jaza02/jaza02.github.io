@@ -330,6 +330,7 @@ const supabaseClient = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 let currentUser=null;
 let saldo=0;
 let gmailCount=0;
+let selectedGmailId = null;
 let lastWithdraw=0;
 let gmailHistory=[];
 let submitterWhatsApp="";
@@ -782,6 +783,182 @@ supabaseClient.auth.onAuthStateChange((event,session)=>{
 });
 
 loadUser();
+async function bukaReviewGmail(id){
+
+  selectedGmailId = Number(id);
+
+  if(!selectedGmailId){
+    alert("ID Gmail tidak valid.");
+    return;
+  }
+
+  try{
+
+    const { data, error } = await supabaseClient
+      .from("gmail_submissions")
+      .select("id,gmail,submitter_id,submitter_wtext,status,amount")
+      .eq("id", selectedGmailId)
+      .single();
+
+    if(error) throw error;
+
+    if(String(data.status).toLowerCase() !== "menunggu"){
+      alert("Gmail ini sudah diproses.");
+      return;
+    }
+
+    document.getElementById("reviewGmail").textContent =
+      data.gmail || "-";
+
+    document.getElementById("reviewSubmitter").textContent =
+      data.submitter_wtext || "-";
+
+    document.getElementById("reviewAmount").value = "";
+    document.getElementById("reviewNote").value = "";
+
+    setMessage(
+      "reviewMessage",
+      "#8fa0b5",
+      ""
+    );
+
+    bukaModal("reviewGmailModal");
+
+  }catch(error){
+
+    console.error(error);
+
+    alert(
+      "Gagal mengambil data Gmail: " +
+      (error.message || "Unknown error")
+    );
+  }
+}
+
+
+async function prosesGmailAdmin(status){
+
+  if(!currentUser){
+    setMessage(
+      "reviewMessage",
+      "#ff8b8b",
+      "Anda harus login sebagai admin."
+    );
+    return;
+  }
+
+  if(!selectedGmailId){
+    setMessage(
+      "reviewMessage",
+      "#ff8b8b",
+      "ID Gmail tidak ditemukan."
+    );
+    return;
+  }
+
+  const amount =
+    Number(
+      document.getElementById("reviewAmount").value || 0
+    );
+
+  const note =
+    document.getElementById("reviewNote").value.trim();
+
+  if(status === "diterima" && amount <= 0){
+
+    setMessage(
+      "reviewMessage",
+      "#ff8b8b",
+      "Masukkan nominal terlebih dahulu."
+    );
+
+    return;
+  }
+
+  const acceptButton =
+    document.querySelector(
+      '#reviewGmailModal button[onclick*="diterima"]'
+    );
+
+  const rejectButton =
+    document.querySelector(
+      '#reviewGmailModal button[onclick*="ditolak"]'
+    );
+
+  if(acceptButton) acceptButton.disabled = true;
+  if(rejectButton) rejectButton.disabled = true;
+
+  setMessage(
+    "reviewMessage",
+    "#8fa0b5",
+    "Sedang memproses..."
+  );
+
+  try{
+
+    const { data, error } =
+      await supabaseClient.rpc(
+        "admin_review_gmail",
+        {
+          p_submission_id: selectedGmailId,
+          p_status: status,
+          p_amount: status === "diterima" ? amount : 0,
+          p_note: note || null
+        }
+      );
+
+    if(error) throw error;
+
+    if(status === "diterima"){
+
+      setMessage(
+        "reviewMessage",
+        "#55dda9",
+        "✓ Gmail diterima. Saldo pengguna berhasil ditambahkan."
+      );
+
+    }else{
+
+      setMessage(
+        "reviewMessage",
+        "#ff8b8b",
+        "✓ Gmail berhasil ditolak."
+      );
+    }
+
+    setTimeout(function(){
+
+      tutupModal("reviewGmailModal");
+
+      selectedGmailId = null;
+
+      if(typeof loadAdminData === "function"){
+        loadAdminData();
+      }
+
+      if(typeof bukaAdmin === "function"){
+        bukaAdmin();
+      }
+
+    }, 1000);
+
+  }catch(error){
+
+    console.error(error);
+
+    setMessage(
+      "reviewMessage",
+      "#ff8b8b",
+      error.message || "Gagal memproses Gmail."
+    );
+
+  }finally{
+
+    if(acceptButton) acceptButton.disabled = false;
+    if(rejectButton) rejectButton.disabled = false;
+
+  }
+ }
 </script>
 </body>
 </html>
