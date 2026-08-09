@@ -448,6 +448,10 @@ async function kirimSemuaGmail(){
   document.getElementById("gmailActivityTitle").textContent=emails.length+" Gmail berhasil dicatat";
   document.getElementById("gmailActivityText").textContent="Kontak penyetor: "+wa;
   msg.style.color="#5ce2ae";msg.textContent="Berhasil mencatat "+Number(data||emails.length)+" Gmail.";
+ setTimeout(()=>{
+    tutupModal("gmailModal");
+    keBeranda();
+},800);
 }
 
 function bukaProfil(){if(!currentUser){bukaLogin();return}updateTampilan();bukaModal("profileModal");setNav("navProfil")}
