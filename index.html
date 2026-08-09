@@ -400,25 +400,28 @@ function bukaTarikSaldo(){
 }
 
 async function ajukanPenarikan(){
- if(!currentUser){bukaLogin();return}
- const jumlah=Number(document.getElementById("withdrawAmount").value);
- const metode=document.getElementById("withdrawMethod").value;
- const tujuan=document.getElementById("withdrawDestination").value.trim();
- const msg=document.getElementById("withdrawMessage");
- if(jumlah<=0){msg.style.color="#ff6b6b";msg.textContent="Masukkan jumlah penarikan.";return}
- if(jumlah>saldo){msg.style.color="#ff6b6b";msg.textContent="Saldo tidak mencukupi.";return}
- if(!metode){msg.style.color="#ff6b6b";msg.textContent="Pilih metode penarikan.";return}
- if(!tujuan){msg.style.color="#ff6b6b";msg.textContent="Masukkan tujuan penarikan.";return}
- msg.style.color="#8fa0b5";msg.textContent="Mengirim pengajuan...";
- const {error}=await supabaseClient.from("withdrawals").insert({user_id:currentUser.id,amount:jumlah,method:metode,destination:tujuan,status:"pending"});
- if(error){msg.style.color="#ff6b6b";msg.textContent=error.message;return}
- const newSaldo=saldo-jumlah;
- const {error:profileError}=await supabaseClient.from("profiles").update({saldo:newSaldo}).eq("id",currentUser.id);
- if(profileError){msg.style.color="#ff6b6b";msg.textContent="Pengajuan tersimpan, tetapi saldo belum diperbarui. Hubungi admin.";return}
- saldo=newSaldo;lastWithdraw=jumlah;updateTampilan();
- document.getElementById("withdrawActivityTitle").textContent="Penarikan menunggu proses";
- document.getElementById("withdrawActivityText").textContent=metode+" • "+rupiah(jumlah);
- msg.style.color="#5ce2ae";msg.textContent="Penarikan berhasil diajukan dan menunggu transfer admin.";
+  if(!currentUser){bukaLogin();return}
+  const jumlah=Number(document.getElementById("withdrawAmount").value);
+  const metode=document.getElementById("withdrawMethod").value;
+  const tujuan=document.getElementById("withdrawDestination").value.trim();
+  const msg=document.getElementById("withdrawMessage");
+  if(jumlah<=0){msg.style.color="#ff6b6b";msg.textContent="Masukkan jumlah penarikan.";return}
+  if(jumlah>saldo){msg.style.color="#ff6b6b";msg.textContent="Saldo tidak mencukupi.";return}
+  if(!metode){msg.style.color="#ff6b6b";msg.textContent="Pilih metode penarikan.";return}
+  if(!tujuan){msg.style.color="#ff6b6b";msg.textContent="Masukkan tujuan penarikan.";return}
+  msg.style.color="#8fa0b5";msg.textContent="Mengirim pengajuan...";
+  try{
+    const rpc=await supabaseClient.rpc("request_withdrawal",{p_amount:jumlah,p_method:metode,p_destination:tujuan});
+    if(rpc.error)throw rpc.error;
+    msg.style.color="#5ce2ae";msg.textContent="Penarikan berhasil diajukan dan saldo telah dikurangi.";
+    await loadUser();
+    document.getElementById("withdrawActivityTitle").textContent="Penarikan menunggu proses";
+    document.getElementById("withdrawActivityText").textContent=metode+" • "+rupiah(jumlah);
+  }catch(error){
+    console.error("ajukanPenarikan:",error);
+    msg.style.color="#ff6b6b";
+    msg.textContent=error.message||"Gagal mengajukan penarikan.";
+  }
 }
 
 function bukaDetail(){if(!currentUser){bukaLogin();return}updateTampilan();bukaModal("detailModal")}
@@ -647,24 +650,43 @@ async function loadAdminWithdrawals(){
 }
 
 async function simpanWithdrawAdmin(id){
- if(!isAdmin)return;
- const status=document.getElementById("wstatus_"+id).value;
- const note=document.getElementById("wnote_"+id).value.trim();
- const {data:old,error:oldError}=await supabaseClient.from("withdrawals").select("id,user_id,amount,status").eq("id",id).single();
- if(oldError){setMessage("adminMessage","#ff6b6b",oldError.message);return}
- if(old.status==="success"&&status!=="success"){setMessage("adminMessage","#ff6b6b","Penarikan yang sudah berhasil ditransfer tidak boleh dibatalkan dari panel ini.");await loadAdminWithdrawals();return}
- const refund=(old.status!=="rejected"&&status==="rejected")?Number(old.amount||0):0;
- if(refund>0){
-  const {data:profile,error:pe}=await supabaseClient.from("profiles").select("saldo").eq("id",old.user_id).single();
-  if(pe){setMessage("adminMessage","#ff6b6b",pe.message);return}
-  const {error:e}=await supabaseClient.from("profiles").update({saldo:Number(profile.saldo||0)+refund}).eq("id",old.user_id);
-  if(e){setMessage("adminMessage","#ff6b6b",e.message);return}
- }
- const {error}=await supabaseClient.from("withdrawals").update({status,admin_note:note,processed_at:new Date().toISOString()}).eq("id",id);
- if(error){setMessage("adminMessage","#ff6b6b",error.message);return}
- setMessage("adminMessage","#5ce2ae",status==="rejected"?"Penarikan ditolak dan saldo dikembalikan.":status==="success"?"Status transfer berhasil disimpan.":"Status penarikan dikembalikan ke menunggu.");
- await loadAdminWithdrawals();
- if(currentUser?.id===old.user_id)await loadUser();
+  if(!isAdmin){setMessage("adminMessage","#ff6b6b","Akses Admin ditolak.");return}
+  const status=document.getElementById("wstatus_"+id).value;
+  const note=document.getElementById("wnote_"+id).value.trim();
+  try{
+    const {data:old,error:oldError}=await supabaseClient.from("withdrawals").select("id,user_id,amount,status").eq("id",id).single();
+    if(oldError)throw oldError;
+    if(old.status==="success"&&status!=="success"){
+      setMessage("adminMessage","#ff6b6b","Penarikan yang sudah berhasil ditransfer tidak boleh dibatalkan.");
+      await loadAdminWithdrawals();
+      return;
+    }
+    if(old.status==="rejected"&&status==="rejected"){
+      setMessage("adminMessage","#ffb66b","Penarikan ini sudah ditolak; saldo tidak dikembalikan lagi.");
+      await loadAdminWithdrawals();
+      return;
+    }
+    if(status==="rejected"){
+      const rpc=await supabaseClient.rpc("admin_reject_withdrawal",{
+        p_withdrawal_id:Number(id),
+        p_admin_note:note
+      });
+      if(rpc.error)throw rpc.error;
+      setMessage("adminMessage","#5ce2ae","Penarikan ditolak dan saldo dikembalikan tepat satu kali.");
+    }else{
+      const {error}=await supabaseClient.from("withdrawals")
+        .update({status,admin_note:note,processed_at:new Date().toISOString()})
+        .eq("id",id)
+        .eq("status","pending");
+      if(error)throw error;
+      setMessage("adminMessage","#5ce2ae",status==="success"?"Status transfer berhasil disimpan.":"Status penarikan dikembalikan ke menunggu.");
+    }
+    await loadAdminWithdrawals();
+    if(currentUser?.id===old.user_id)await loadUser();
+  }catch(error){
+    console.error("simpanWithdrawAdmin:",error);
+    setMessage("adminMessage","#ff6b6b",error.message||"Gagal memperbarui penarikan.");
+  }
 }
 
 document.querySelectorAll(".modal").forEach(modal=>modal.addEventListener("click",e=>{if(e.target===modal)modal.style.display="none"}));
