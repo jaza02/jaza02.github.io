@@ -1,12 +1,36 @@
 <!doctype html><html lang="id"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MailMX Pro - Dashboard</title>
+<title>MailMX Pro Dashboard</title>
 <style>
 *{box-sizing:border-box}html,body{margin:0;background:#030817;color:#f4f7ff;font-family:Arial,sans-serif}button{font:inherit;cursor:pointer}
-.header{height:84px;border-bottom:1px solid #172139;background:#050a18;display:flex;align-items:center;padding:0 20px;gap:14px}.logo{width:54px;height:54px;border-radius:16px;background:#3864ee;display:grid;place-items:center;font-weight:900;font-size:22px}.brand b{display:block;font-size:20px}.brand small{color:#6491ff;font-weight:800}.spacer{flex:1}.nav,.logout{border:1px solid #1c3156;background:#09132b;color:#7aa8ff;border-radius:25px;padding:10px 15px}.logout{background:#240d1a;border-color:#54213a;color:#ff7987}
-.wrap{max-width:900px;margin:auto;padding:30px 20px 100px}.card,.alert{border:1px solid #1b2941;background:#0b1224;border-radius:20px;margin-bottom:24px;overflow:hidden}.alert{padding:22px;border-color:#72541b;background:#191622}.alert .icon{float:left;width:48px;height:48px;border-radius:14px;background:#4c3517;display:grid;place-items:center;font-size:25px;margin-right:16px}.alert b{color:#ffd34e}.alert p{margin:6px 0 0;color:#ddd;font-size:14px}
-.channel{padding:24px;border-color:#06404b;background:#07172a}.channel h3{color:#5fe5bb;margin:0 0 6px}.channel p,.welcome p{color:#8491a5}.btn{border:0;border-radius:15px;padding:12px 18px;color:#fff;font-weight:800;width:100%;background:#08aa75}.welcome{padding:30px}.welcome h1{margin:0 0 8px;font-size:25px}.welcome h1 span{color:#5f9aff}.rate{margin-top:22px;padding:11px 15px;border:1px solid #1b3a6d;background:#0b1935;border-radius:15px}.rate span{color:#65a0ff}
-.balance{padding:26px;border-left:5px solid #08b77c}.label{font-size:12px;color:#8d98aa}.amount{font-size:28px;color:#25e29e;font-weight:900;margin:6px 0 18px}.stat{padding:28px;border-left:5px solid #4b83ff;position:relative}.purple{border-left-color:#a855f7!important}.value{font-size:27px;font-weight:900;color:#bd78ff;margin:5px 0}.iconbox{position:absolute;right:26px;top:30px;width:52px;height:52px;border-radius:15px;background:#102a50;display:grid;place-items:center;font-size:24px}.big-action,.history{padding:24px}.start{background:#3853e8}.history h2{font-size:20px;margin:0 0 18px}.history h2 span{float:right;color:#8792a4;font-size:14px;font-weight:500}.table{border:1px solid #1a2740;border-radius:16px;overflow:auto;min-height:135px}table{width:100%;border-collapse:collapse;min-width:500px}th,td{padding:16px;text-align:left;border-bottom:1px solid #1a2740}th{color:#8d99ae;font-size:13px}td{color:#727d91}.empty{text-align:center;font-style:italic;padding:35px}.bottom{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);width:min(860px,calc(100% - 40px));padding:8px;background:#071022;border:1px solid #17324c;border-radius:20px}@media(max-width:600px){.wrap{padding:28px 20px 100px}.brand b{font-size:18px}.brand small{font-size:11px}.nav{display:none}}
+.header{height:84px;border-bottom:1px solid #172139;background:#050a18;display:flex;align-items:center;padding:0 20px;gap:14px;position:sticky;top:0;z-index:20}.logo{width:54px;height:54px;border-radius:16px;background:#3864ee;display:grid;place-items:center;font-weight:900;font-size:22px}.brand b{display:block;font-size:20px}.brand small{color:#6491ff;font-weight:800}.spacer{flex:1}.nav,.logout{border:1px solid #1c3156;background:#09132b;color:#7aa8ff;border-radius:25px;padding:10px 15px}.logout{background:#240d1a;border-color:#54213a;color:#ff7987}
+.wrap{max-width:900px;margin:auto;padding:30px 20px 40px}.card,.alert{border:1px solid #1b2941;background:#0b1224;border-radius:20px;margin-bottom:22px;overflow:hidden;box-shadow:0 4px 18px rgba(0,0,0,.12)}.alert{padding:18px 20px;border-color:#72541b;background:#191622}.alert .icon{float:left;width:48px;height:48px;border-radius:14px;background:#4c3517;display:grid;place-items:center;font-size:25px;margin-right:16px}.alert b{color:#ffd34e}.alert p{margin:6px 0 0;color:#ddd;font-size:14px}
+.channel{padding:20px;border-color:#06404b;background:#07172a}.channel h3{color:#5fe5bb;margin:0 0 6px}.channel p,.welcome p{color:#8491a5}.btn{border:0;border-radius:14px;padding:11px 18px;color:#fff;font-weight:800;width:100%;background:#08aa75;min-height:42px}.welcome{padding:24px}.welcome h1{margin:0 0 8px;font-size:24px;line-height:1.25}.welcome h1 span{color:#5f9aff}.rate{margin-top:22px;padding:11px 15px;border:1px solid #1b3a6d;background:#0b1935;border-radius:15px}.rate span{color:#65a0ff}
+.balance{padding:22px 24px;border-left:5px solid #08b77c}.label{font-size:12px;color:#8d98aa}.amount{font-size:28px;color:#25e29e;font-weight:900;margin:6px 0 18px}.stat{padding:22px 24px;border-left:5px solid #4b83ff;position:relative;min-height:116px}.purple{border-left-color:#a855f7!important}.value{font-size:27px;font-weight:900;color:#bd78ff;margin:5px 0}.iconbox{position:absolute;right:26px;top:30px;width:52px;height:52px;border-radius:15px;background:#102a50;display:grid;place-items:center;font-size:24px}.big-action,.history{padding:20px}.start{background:#3853e8}.history h2{font-size:20px;margin:0 0 18px}.history h2 span{float:right;color:#8792a4;font-size:14px;font-weight:500}.table{border:1px solid #1a2740;border-radius:16px;overflow:auto;min-height:135px}table{width:100%;border-collapse:collapse;min-width:500px}th,td{padding:16px;text-align:left;border-bottom:1px solid #1a2740}th{color:#8d99ae;font-size:13px}td{color:#727d91}.empty{text-align:center;font-style:italic;padding:35px}.bottom{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);width:min(860px,calc(100% - 40px));padding:8px;background:#071022;border:1px solid #17324c;border-radius:20px}@media(max-width:600px){
+      .header{height:76px;padding:0 16px;gap:10px}
+      .logo{width:48px;height:48px;border-radius:14px;font-size:20px}
+      .brand b{font-size:18px}.brand small{font-size:10px}
+      .logout{padding:9px 14px;font-size:14px}
+      .wrap{padding:22px 20px 28px}
+      .alert,.card{margin-bottom:20px;border-radius:19px}
+      .alert{padding:16px}
+      .alert .icon{width:44px;height:44px;margin-right:12px}
+      .alert b{font-size:14px;line-height:1.35}
+      .alert p{font-size:13px;line-height:1.45}
+      .channel{padding:18px}
+      .channel h3{font-size:17px;line-height:1.35}
+      .channel p{font-size:14px;line-height:1.45}
+      .welcome{padding:22px}
+      .welcome h1{font-size:23px}
+      .welcome p{font-size:14px;line-height:1.5}
+      .rate{font-size:13px}
+      .balance{padding:20px}
+      .amount{font-size:26px}
+      .stat{padding:20px;min-height:110px}
+      .iconbox{right:20px;top:24px;width:48px;height:48px}
+      .history h2{font-size:18px}
+      th,td{padding:13px;font-size:12px}
+    }
 </style></head><body>
 <header class="header"><div class="logo">MX</div><div class="brand"><b>MailMX</b><small>PRO PLATFORM</small></div><div class="spacer"></div><button class="nav">▦ Dashboard</button><button class="logout" onclick="alert('Demo: tombol keluar')">Keluar</button></header>
 <main class="wrap">
@@ -19,7 +43,7 @@
 <section class="card big-action"><button class="btn start" onclick="startGmail()">➤ &nbsp; Mulai Stor Gmail</button></section>
 <section class="card history"><h2>◷ &nbsp; Riwayat Pengiriman Gmail</h2><div class="table"><table><thead><tr><th>TANGGAL</th><th>JUMLAH GMAIL</th><th>STATUS</th></tr></thead><tbody id="gmailHistory"><tr><td colspan="3" class="empty">Belum ada riwayat stor.</td></tr></tbody></table></div></section>
 <section class="card history"><h2>Riwayat Penarikan Saldo <span>↻ Refresh</span></h2><div class="table"><table><thead><tr><th>TANGGAL</th><th>METODE</th><th>NOMOR TUJUAN</th></tr></thead><tbody id="withdrawHistory"><tr><td colspan="3" class="empty">Belum ada riwayat penarikan.</td></tr></tbody></table></div></section>
-</main><div class="bottom"><button class="btn" onclick="withdraw()">Tarik Saldo</button></div>
+</main>
 <script>
 let balance=0;
 const rupiah=n=>"Rp "+n.toLocaleString("id-ID");
