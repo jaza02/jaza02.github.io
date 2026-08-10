@@ -345,15 +345,19 @@ function fmtDate(v){if(!v)return "-";try{return new Date(v).toLocaleString("id-I
 
 async function loadPublicStats(){
  try{
-  const {count:userCount,error:userError}=await supabaseClient.from("profiles").select("id",{count:"exact",head:true});
-  if(userError)throw userError;
-  const {data:withdrawRows,error:withdrawError}=await supabaseClient.from("withdrawals").select("amount").in("status",["success","berhasil","completed","paid"]);
-  if(withdrawError)throw withdrawError;
-  const totalWithdrawals=(withdrawRows||[]).reduce((sum,row)=>sum+Number(row.amount||0),0);
+  // Statistik publik diambil melalui RPC agar pengunjung yang belum login
+  // tidak bergantung pada SELECT langsung yang bisa diblokir oleh RLS.
+  const {data,error}=await supabaseClient.rpc("get_public_platform_stats");
+  if(error)throw error;
+  const stats=Array.isArray(data)?(data[0]||{}):(data||{});
+  const userCount=Number(stats.total_users||0);
+  const totalWithdrawals=Number(stats.total_withdrawals||0);
   const usersEl=document.getElementById("publicTotalUsers"), withdrawalsEl=document.getElementById("publicTotalWithdrawals");
-  if(usersEl)usersEl.textContent=Number(userCount||0).toLocaleString("id-ID");
+  if(usersEl)usersEl.textContent=userCount.toLocaleString("id-ID");
   if(withdrawalsEl)withdrawalsEl.textContent=rupiah(totalWithdrawals);
- }catch(error){console.warn("Gagal memuat statistik publik:",error)}
+ }catch(error){
+  console.warn("Gagal memuat statistik publik:",error);
+ }
 }
 
 async function ensureProfile(){
