@@ -667,11 +667,20 @@ async function simpanWithdrawAdmin(id){
       return;
     }
     if(status==="rejected"){
+      // RPC database pada project ini hanya menerima p_withdrawal_id.
+      // Refund dilakukan oleh RPC; catatan tidak dikirim ke RPC agar tidak mismatch signature.
       const rpc=await supabaseClient.rpc("admin_reject_withdrawal",{
-        p_withdrawal_id:Number(id),
-        p_admin_note:note
+        p_withdrawal_id:Number(id)
       });
       if(rpc.error)throw rpc.error;
+
+      // Simpan catatan setelah refund berhasil, tanpa menjalankan refund kedua.
+      if(note){
+        const noteUpdate=await supabaseClient.from("withdrawals")
+          .update({admin_note:note})
+          .eq("id",Number(id));
+        if(noteUpdate.error) console.warn("Catatan admin tidak tersimpan:",noteUpdate.error);
+      }
       setMessage("adminMessage","#5ce2ae","Penarikan ditolak dan saldo dikembalikan tepat satu kali.");
     }else{
       const {error}=await supabaseClient.from("withdrawals")
