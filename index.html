@@ -58,6 +58,10 @@ button{font:inherit;border:0;cursor:pointer}
 .history-note{margin-top:8px;padding:8px 9px;border-radius:9px;background:#0d1a2b;color:#b9c7d8;font-size:11px;line-height:1.4}
 .history-status{font-size:11px;font-weight:900;white-space:nowrap}
 .history-amount{margin-top:7px;color:#5ce2ae;font-weight:800}
+.withdraw-status-pending{color:#ffb66b}
+.withdraw-status-success{color:#5ce2ae}
+.withdraw-status-rejected{color:#ff6b6b}
+
 @media(max-width:520px){.history-summary{gap:6px}.history-summary div{padding:9px}.history-filter{min-width:90px}}
 </style>
 </head>
@@ -139,7 +143,7 @@ button{font:inherit;border:0;cursor:pointer}
  <section class="card">
   <div class="transaction"><div class="tx-icon">✉️</div><div class="tx-main"><b id="gmailActivityTitle">Belum ada pengiriman</b><small id="gmailActivityText">Aktivitas Gmail akan muncul di sini</small></div><div class="tx-value">—</div></div>
   <div class="transaction"><div class="tx-icon">💳</div><div class="tx-main"><b id="withdrawActivityTitle">Belum ada penarikan</b><small id="withdrawActivityText">Riwayat saldo masih kosong</small></div><div class="tx-value">—</div></div>
-  <button class="btn secondary" style="width:100%;margin-top:12px" onclick="bukaRiwayatGmail()">Lihat Riwayat Gmail</button>
+  <button class="btn secondary" style="width:100%;margin-top:12px" onclick="bukaRiwayatGmail()">Lihat Riwayat Gmail</button><button class="btn secondary" style="width:100%;margin-top:8px" onclick="bukaRiwayatPenarikan()">Lihat Riwayat Penarikan</button>
  </section>
 </section>
 </main>
@@ -233,6 +237,21 @@ button{font:inherit;border:0;cursor:pointer}
  </div>
 </div>
 
+<!-- RIWAYAT PENARIKAN USER -->
+<div id="withdrawHistoryModal" class="modal">
+ <div class="modal-box" style="width:min(620px,100%)">
+  <div class="modal-header"><h2>Riwayat Penarikan</h2><button class="close" onclick="tutupModal('withdrawHistoryModal')">×</button></div>
+  <div id="userWithdrawSummary" class="history-summary"></div>
+  <div id="userWithdrawFilters" class="history-filters">
+   <button class="history-filter active" onclick="setUserWithdrawFilter('all')">Semua</button>
+   <button class="history-filter" onclick="setUserWithdrawFilter('pending')">Menunggu</button>
+   <button class="history-filter" onclick="setUserWithdrawFilter('success')">Berhasil</button>
+   <button class="history-filter" onclick="setUserWithdrawFilter('rejected')">Ditolak</button>
+  </div>
+  <div id="userWithdrawHistoryList" class="history-list"></div>
+ </div>
+</div>
+
 <!-- ADMIN -->
 <div id="adminModal" class="modal">
  <div class="modal-box" style="width:min(1100px,100%)">
@@ -291,7 +310,10 @@ let submitterWhatsApp="";
 let isAdmin=false;
 let adminTab="gmail";
 let adminGmailFilter="all";
+let adminWithdrawFilter="all";
 let userGmailFilter="all";
+let userWithdrawFilter="all";
+let withdrawHistory=[];
 
 function rupiah(n){return "Rp "+Number(n||0).toLocaleString("id-ID")}
 function setMessage(id,color,text){const el=document.getElementById(id);if(el){el.style.color=color;el.textContent=text}}
@@ -561,6 +583,69 @@ function bukaRiwayatGmail(){
  bukaModal("gmailHistoryModal");
 }
 
+function withdrawStatusType(status){
+ const s=String(status||"").toLowerCase();
+ if(s==="success"||s==="berhasil"||s==="completed"||s==="paid")return "success";
+ if(s==="rejected"||s==="ditolak")return "rejected";
+ return "pending";
+}
+function withdrawStatusLabel(status){
+ const t=withdrawStatusType(status);
+ return t==="success"?"Berhasil":t==="rejected"?"Ditolak":"Menunggu review";
+}
+function renderUserWithdrawHistory(){
+ const rows=withdrawHistory||[];
+ const pending=rows.filter(r=>withdrawStatusType(r.status)==="pending").length;
+ const success=rows.filter(r=>withdrawStatusType(r.status)==="success").length;
+ const rejected=rows.filter(r=>withdrawStatusType(r.status)==="rejected").length;
+ document.getElementById("userWithdrawSummary").innerHTML=
+  '<div><span class="admin-small">Menunggu</span><b class="withdraw-status-pending">'+pending+'</b></div>'+
+  '<div><span class="admin-small">Berhasil</span><b class="withdraw-status-success">'+success+'</b></div>'+
+  '<div><span class="admin-small">Ditolak</span><b class="withdraw-status-rejected">'+rejected+'</b></div>';
+ document.querySelectorAll("#userWithdrawFilters .history-filter").forEach(btn=>{
+  const txt=btn.textContent.toLowerCase();
+  const key=txt.includes("menunggu")?"pending":txt.includes("berhasil")?"success":txt.includes("ditolak")?"rejected":"all";
+  btn.classList.toggle("active",key===userWithdrawFilter);
+ });
+ const filtered=userWithdrawFilter==="all"?rows:rows.filter(r=>withdrawStatusType(r.status)===userWithdrawFilter);
+ const list=document.getElementById("userWithdrawHistoryList");
+ if(!filtered.length){
+  list.innerHTML='<div class="admin-empty">Belum ada penarikan pada kategori ini.</div>';
+  return;
+ }
+ list.innerHTML=filtered.map(r=>{
+  const type=withdrawStatusType(r.status);
+  const cls=type==="success"?"withdraw-status-success":type==="rejected"?"withdraw-status-rejected":"withdraw-status-pending";
+  const note=r.admin_note||"";
+  return '<div class="history-item">'+
+   '<div class="history-top"><div class="history-email">'+safe(r.method||"Penarikan")+'<div class="history-meta">'+safe(r.destination||"")+'</div></div>'+
+   '<span class="history-status '+cls+'">'+withdrawStatusLabel(r.status)+'</span></div>'+
+   '<div class="history-amount">Jumlah: '+rupiah(Number(r.amount||0))+'</div>'+
+   '<div class="history-meta">Diajukan: '+safe(fmtDate(r.created_at))+(r.processed_at?' • Diproses: '+safe(fmtDate(r.processed_at)):'')+'</div>'+
+   (note?'<div class="history-note">Catatan admin: '+safe(note)+'</div>':'')+
+   '</div>';
+ }).join("");
+}
+function setUserWithdrawFilter(filter){
+ userWithdrawFilter=filter;
+ renderUserWithdrawHistory();
+}
+async function bukaRiwayatPenarikan(){
+ if(!currentUser){bukaLogin();return}
+ const {data,error}=await supabaseClient.from("withdrawals")
+   .select("id,amount,method,destination,status,created_at,admin_note,processed_at")
+   .eq("user_id",currentUser.id)
+   .order("created_at",{ascending:false});
+ if(error){
+  alert(error.message||"Gagal memuat riwayat penarikan.");
+  return;
+ }
+ withdrawHistory=data||[];
+ userWithdrawFilter="all";
+ renderUserWithdrawHistory();
+ bukaModal("withdrawHistoryModal");
+}
+
 function bukaProfil(){if(!currentUser){bukaLogin();return}updateTampilan();bukaModal("profileModal");setNav("navProfil")}
 function bukaWhatsApp(){window.location.href="whatsapp://channel/0029VbDHNQjDTkK7mUgohZ1n";setTimeout(()=>window.open(WHATSAPP_CHANNEL_URL,"_blank","noopener"),1000)}
 function setNav(id){document.querySelectorAll(".bottom-nav button").forEach(b=>b.classList.remove("active"));const b=document.getElementById(id);if(b)b.classList.add("active")}
@@ -745,6 +830,16 @@ async function tolakGmailAdmin(id){
   }catch(error){console.error("tolakGmailAdmin:",error);setMessage("adminMessage","#ff6b6b",error.message||"Gagal menolak Gmail.");}
 }
 
+function setAdminWithdrawFilter(filter){
+ adminWithdrawFilter=filter;
+ document.querySelectorAll("#adminWithdrawFilters .history-filter").forEach(btn=>{
+  const txt=btn.textContent.toLowerCase();
+  const key=txt.includes("menunggu")?"pending":txt.includes("berhasil")?"success":txt.includes("ditolak")?"rejected":"all";
+  btn.classList.toggle("active",key===adminWithdrawFilter);
+ });
+ loadAdminWithdrawals();
+}
+
 async function loadAdminWithdrawals(){
  if(!isAdmin)return;
  setMessage("adminMessage","#8fa0b5","Memuat penarikan...");
@@ -755,7 +850,13 @@ async function loadAdminWithdrawals(){
  const pmap=Object.fromEntries(profiles.map(p=>[p.id,p.email]));const rows=data||[];
  const pending=rows.filter(x=>x.status==="pending").length,success=rows.filter(x=>x.status==="success").length,rejected=rows.filter(x=>x.status==="rejected").length;
  document.getElementById("adminWithdrawSummary").innerHTML='<div><span class="admin-small">Menunggu</span><b class="status-pending">'+pending+'</b></div><div><span class="admin-small">Berhasil</span><b class="status-success">'+success+'</b></div><div><span class="admin-small">Ditolak</span><b class="status-rejected">'+rejected+'</b></div>';
- const body=document.getElementById("adminWithdrawBody");
+ document.querySelectorAll("#adminWithdrawFilters .history-filter").forEach(btn=>{
+    const txt=btn.textContent.toLowerCase();
+    const key=txt.includes("menunggu")?"pending":txt.includes("berhasil")?"success":txt.includes("ditolak")?"rejected":"all";
+    btn.classList.toggle("active",key===adminWithdrawFilter);
+  });
+  const filteredRows=adminWithdrawFilter==="all"?rows:rows.filter(x=>withdrawStatusType(x.status)===adminWithdrawFilter);
+  const body=document.getElementById("adminWithdrawBody");
  if(!rows.length){body.innerHTML='<tr><td colspan="8" class="admin-empty">Belum ada penarikan.</td></tr>';setMessage("adminMessage","#5ce2ae","Belum ada penarikan.");return}
  body.innerHTML=rows.map(r=>`<tr>
  <td>${safe(pmap[r.user_id]||r.user_id)}</td><td><b>${rupiah(r.amount)}</b></td><td>${safe(r.method)}</td><td>${safe(r.destination)}</td><td>${safe(fmtDate(r.created_at))}</td>
