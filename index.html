@@ -149,11 +149,10 @@ button{font:inherit;border:0;cursor:pointer}
   </aside>
  </div>
 
- <div class="section-title"><h2>Aktivitas terbaru</h2><span>Riwayat</span></div>
+ <div class="section-title"><h2>Riwayat</h2><span>Aktivitas akun</span></div>
  <section class="card">
-  <div class="transaction"><div class="tx-icon">✉️</div><div class="tx-main"><b id="gmailActivityTitle">Belum ada pengiriman</b><small id="gmailActivityText">Aktivitas Gmail akan muncul di sini</small></div><div class="tx-value">—</div></div>
-  <div class="transaction"><div class="tx-icon">💳</div><div class="tx-main"><b id="withdrawActivityTitle">Belum ada penarikan</b><small id="withdrawActivityText">Riwayat saldo masih kosong</small></div><div class="tx-value">—</div></div>
-  <button class="btn secondary" style="width:100%;margin-top:12px" onclick="bukaRiwayatGmail()">Lihat Riwayat Gmail</button><button class="btn secondary" style="width:100%;margin-top:8px" onclick="bukaRiwayatPenarikan()">Lihat Riwayat Penarikan</button>
+  <button class="btn secondary" style="width:100%;margin-top:0" onclick="bukaRiwayatGmail()">Lihat Riwayat Gmail</button>
+  <button class="btn secondary" style="width:100%;margin-top:8px" onclick="bukaRiwayatPenarikan()">Lihat Riwayat Penarikan</button>
  </section>
 </section>
 </main>
@@ -494,8 +493,6 @@ async function ajukanPenarikan(){
     if(rpc.error)throw rpc.error;
     msg.style.color="#5ce2ae";msg.textContent="Penarikan berhasil diajukan dan saldo telah dikurangi.";
     await loadUser();
-    document.getElementById("withdrawActivityTitle").textContent="Penarikan menunggu proses";
-    document.getElementById("withdrawActivityText").textContent=metode+" • "+rupiah(jumlah);
   }catch(error){
     console.error("ajukanPenarikan:",error);
     msg.style.color="#ff6b6b";
@@ -541,8 +538,6 @@ async function kirimSemuaGmail(){
  await supabaseClient.from("profiles").update({whatsapp:wa}).eq("id",currentUser.id);
  submitterWhatsApp=wa;
  await loadUser();
- document.getElementById("gmailActivityTitle").textContent=emails.length+" Gmail berhasil dikirim";
- document.getElementById("gmailActivityText").textContent="Status: menunggu pemeriksaan admin • Kontak: "+wa;
  msg.style.color="#5ce2ae";msg.textContent="Berhasil mencatat "+emails.length+" Gmail. Menunggu pemeriksaan admin.";
 }
 
