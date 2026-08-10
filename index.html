@@ -51,6 +51,16 @@ button{font:inherit;border:0;cursor:pointer}
 .history-filter{flex:1;min-width:95px;padding:9px 10px;border-radius:10px;background:#17304b;color:#9fc0ff;font-weight:800;border:1px solid #294b72}
 .history-filter.active{background:#24584e;color:#fff;border-color:#2b705e}
 .history-list{display:flex;flex-direction:column;gap:9px}
+.admin-user-group{margin:0 0 14px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#0e1d2e}
+.admin-user-group-head{padding:12px 13px;background:#132a42;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.admin-user-group-title{font-weight:900;color:#fff}
+.admin-user-group-count{font-size:11px;color:#9fc0ff;font-weight:800}
+.admin-user-group-table{width:100%;border-collapse:collapse}
+.admin-user-group-table th,.admin-user-group-table td{padding:9px 8px;border-bottom:1px solid rgba(255,255,255,.06);vertical-align:top;text-align:left;font-size:11px}
+.admin-user-group-table th{color:#8fa0b5;font-weight:800;background:#102238}
+.admin-user-group-table tr:last-child td{border-bottom:0}
+.admin-user-group-table td:first-child{word-break:break-all}
+
 .history-item{padding:12px;border:1px solid var(--line);border-radius:13px;background:#102238}
 .history-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
 .history-email{font-weight:800;word-break:break-all}
@@ -269,7 +279,8 @@ button{font:inherit;border:0;cursor:pointer}
     <button class="history-filter" onclick="setAdminGmailFilter('accepted')">Diterima</button>
     <button class="history-filter" onclick="setAdminGmailFilter('rejected')">Ditolak</button>
    </div>
-   <div class="admin-scroll"><table class="admin-table"><thead><tr><th>Gmail</th><th>Penyetor</th><th>WhatsApp</th><th>Tanggal</th><th>Status</th><th>Nominal</th><th>Catatan</th><th>Aksi</th></tr></thead><tbody id="adminGmailBody"></tbody></table></div>
+   <div id="adminGmailGroups"></div>
+   <div id="adminGmailBody" style="display:none"></div>
   </div>
   <div id="adminWithdrawPanel" style="display:none">
    <div id="adminWithdrawSummary" class="admin-summary"></div>
@@ -684,102 +695,87 @@ function setAdminGmailFilter(filter){
 }
 
 async function loadAdminGmail(){
-  if(!isAdmin)return;
+ if(!isAdmin)return;
+ const {data:rows,error}=await supabaseClient
+   .from("gmail_submissions")
+   .select("id,user_id,gmail,submitter_whatsapp,created_at,status,amount,reviewed_at,admin_note")
+   .order("created_at",{ascending:false});
+ if(error){setMessage("adminMessage","#ff6b6b",error.message);return}
 
-  setMessage("adminMessage","#8fa0b5","Memuat data Gmail...");
+ const filterButtons=document.querySelectorAll("#adminGmailFilters .history-filter");
+ filterButtons.forEach(btn=>{
+   const txt=btn.textContent.toLowerCase();
+   const key=txt.includes("menunggu")?"pending":txt.includes("diterima")?"accepted":txt.includes("ditolak")?"rejected":"all";
+   btn.classList.toggle("active",key===adminGmailFilter);
+ });
 
-  const {data,error}=await supabaseClient
-    .from("gmail_submissions")
-    .select("id,user_id,gmail,submitter_whatsapp,created_at,status,amount,reviewed_at,admin_note")
-    .order("created_at",{ascending:false});
+ const normalized=adminGmailFilter==="all"?rows:(rows||[]).filter(r=>{
+   const s=String(r.status||"").toLowerCase();
+   const t=(s==="accepted"||s==="diterima")?"accepted":(s==="rejected"||s==="ditolak")?"rejected":"pending";
+   return t===adminGmailFilter;
+ });
 
-  if(error){
-    setMessage("adminMessage","#ff6b6b",error.message);
-    return;
-  }
+ const summary=document.getElementById("adminGmailSummary");
+ const allRows=rows||[];
+ const p=allRows.filter(r=>{const s=String(r.status||"").toLowerCase();return !(s==="accepted"||s==="diterima"||s==="rejected"||s==="ditolak")}).length;
+ const a=allRows.filter(r=>["accepted","diterima"].includes(String(r.status||"").toLowerCase())).length;
+ const d=allRows.filter(r=>["rejected","ditolak"].includes(String(r.status||"").toLowerCase())).length;
+ if(summary)summary.innerHTML=
+   '<div class="admin-stat"><span>Total</span><b>'+allRows.length+'</b></div>'+
+   '<div class="admin-stat"><span>Menunggu</span><b class="status-pending">'+p+'</b></div>'+
+   '<div class="admin-stat"><span>Diterima</span><b class="status-accepted">'+a+'</b></div>'+
+   '<div class="admin-stat"><span>Ditolak</span><b class="status-rejected">'+d+'</b></div>';
 
-  const rows=data||[];
-  const userIds=[...new Set(rows.map(x=>x.user_id).filter(Boolean))];
-  let profiles=[];
+ const wrap=document.getElementById("adminGmailGroups");
+ if(!wrap)return;
+ if(!normalized.length){
+   wrap.innerHTML='<div class="admin-empty">Belum ada Gmail pada kategori ini.</div>';
+   return;
+ }
 
-  if(userIds.length){
-    const r=await supabaseClient
-      .from("profiles")
-      .select("id,email")
-      .in("id",userIds);
+ // Group strictly by user_id. Display the submitter WhatsApp as an identifier
+ // when available, while keeping the actual grouping key user_id.
+ const groups=new Map();
+ normalized.forEach(r=>{
+   const key=r.user_id||"unknown";
+   if(!groups.has(key))groups.set(key,[]);
+   groups.get(key).push(r);
+ });
 
-    if(!r.error)profiles=r.data||[];
-  }
+ const sortedGroups=[...groups.entries()].sort((x,y)=>{
+   const ax=String(x[1][0]?.submitter_whatsapp||x[0]);
+   const by=String(y[1][0]?.submitter_whatsapp||y[0]);
+   return ax.localeCompare(by);
+ });
 
-  const pmap=Object.fromEntries(profiles.map(p=>[p.id,p.email]));
-
-  const isPending=s=>["pending","menunggu"].includes(String(s||"").toLowerCase());
-  const isAccepted=s=>["accepted","diterima"].includes(String(s||"").toLowerCase());
-  const isRejected=s=>["rejected","ditolak"].includes(String(s||"").toLowerCase());
-
-  const pending=rows.filter(x=>isPending(x.status)).length;
-  const accepted=rows.filter(x=>isAccepted(x.status)).length;
-  const rejected=rows.filter(x=>isRejected(x.status)).length;
-
-  document.getElementById("adminGmailSummary").innerHTML=
-    '<div><span class="admin-small">Menunggu</span><b class="status-pending">'+pending+'</b></div>'+
-    '<div><span class="admin-small">Diterima</span><b class="status-accepted">'+accepted+'</b></div>'+
-    '<div><span class="admin-small">Ditolak</span><b class="status-rejected">'+rejected+'</b></div>';
-
-  document.querySelectorAll("#adminGmailFilters .history-filter").forEach(btn=>{
-    const txt=btn.textContent.toLowerCase();
-    const key=txt.includes("menunggu")?"pending":txt.includes("diterima")?"accepted":txt.includes("ditolak")?"rejected":"all";
-    btn.classList.toggle("active",key===adminGmailFilter);
-  });
-
-  const filteredRows=adminGmailFilter==="all"?rows:rows.filter(x=>{
-    const s=String(x.status||"").toLowerCase();
-    const type=(s==="accepted"||s==="diterima")?"accepted":(s==="rejected"||s==="ditolak")?"rejected":"pending";
-    return type===adminGmailFilter;
-  });
-
-  const body=document.getElementById("adminGmailBody");
-
-  if(!filteredRows.length){
-    body.innerHTML='<tr><td colspan="8" class="admin-empty">Belum ada Gmail pada kategori ini.</td></tr>';
-    setMessage("adminMessage","#5ce2ae","Tidak ada data Gmail.");
-    return;
-  }
-
-  body.innerHTML=filteredRows.map(r=>{
-    const pending=isPending(r.status);
-    const accepted=isAccepted(r.status);
-    const rejected=isRejected(r.status);
-
-    let actionHtml="";
-
-    if(pending){
-      actionHtml=
-        '<div style="display:flex;flex-direction:column;gap:7px">'+
-        '<button class="admin-save" onclick="terimaGmailAdmin('+Number(r.id)+')">✓ Terima</button>'+
-        '<button class="admin-save" style="background:#351d25;color:#ff8d98" onclick="tolakGmailAdmin('+Number(r.id)+')">✕ Tolak</button>'+
-        '</div>';
-    }else if(accepted){
-      actionHtml='<span class="status-accepted">✓ Sudah diterima</span>';
-    }else if(rejected){
-      actionHtml='<span class="status-rejected">✕ Sudah ditolak</span>';
-    }else{
-      actionHtml='<span class="admin-small">Status: '+safe(r.status)+'</span>';
-    }
-
-    return `<tr>
-      <td><b>${safe(r.gmail)}</b><div class="admin-small">ID ${safe(r.id)}</div></td>
-      <td>${safe(pmap[r.user_id]||r.user_id)}</td>
-      <td>${safe(r.submitter_whatsapp||"-")}</td>
-      <td>${safe(fmtDate(r.created_at))}</td>
-      <td>${pending?'<span class="status-pending">Menunggu</span>':accepted?'<span class="status-accepted">Diterima</span>':'<span class="status-rejected">Ditolak</span>'}</td>
-      <td>${rupiah(r.amount||0)}</td>
-      <td>${safe(r.admin_note||"-")}<div class="admin-small">${r.reviewed_at?"Diperiksa: "+safe(fmtDate(r.reviewed_at)):"Belum diperiksa"}</div></td>
-      <td>${actionHtml}</td>
-    </tr>`;
-  }).join("");
-
-  setMessage("adminMessage","#5ce2ae","Data Gmail berhasil dimuat.");
+ wrap.innerHTML=sortedGroups.map(([userId,list],idx)=>{
+   const label=list[0]?.submitter_whatsapp ? "Penyetor: "+safe(list[0].submitter_whatsapp) : "User ID: "+safe(userId);
+   const rowsHtml=list.map(r=>{
+     const s=String(r.status||"").toLowerCase();
+     const type=(s==="accepted"||s==="diterima")?"accepted":(s==="rejected"||s==="ditolak")?"rejected":"pending";
+     const statusLabel=type==="accepted"?"Diterima":type==="rejected"?"Ditolak":"Menunggu review";
+     const statusClass=type==="accepted"?"status-accepted":type==="rejected"?"status-rejected":"status-pending";
+     const action=(type==="pending")?
+       '<div style="display:flex;gap:5px;flex-wrap:wrap">'+
+       '<button class="btn small" onclick="terimaGmailAdmin('+Number(r.id)+')">Terima</button>'+
+       '<button class="btn small danger" onclick="tolakGmailAdmin('+Number(r.id)+')">Tolak</button>'+
+       '</div>':
+       '<span class="admin-small">Sudah diproses</span>';
+     return '<tr>'+
+       '<td><b>'+safe(r.gmail)+'</b></td>'+
+       '<td>'+safe(r.submitter_whatsapp||"—")+'</td>'+
+       '<td>'+safe(fmtDate(r.created_at))+'</td>'+
+       '<td><span class="'+statusClass+'">'+statusLabel+'</span></td>'+
+       '<td>'+rupiah(Number(r.amount||0))+'</td>'+
+       '<td>'+safe(r.admin_note||"—")+'</td>'+
+       '<td>'+action+'</td>'+
+       '</tr>';
+   }).join("");
+   return '<div class="admin-user-group">'+
+     '<div class="admin-user-group-head"><div class="admin-user-group-title">'+label+'</div><div class="admin-user-group-count">'+list.length+' Gmail</div></div>'+
+     '<div class="admin-scroll"><table class="admin-user-group-table"><thead><tr><th>Gmail</th><th>WhatsApp</th><th>Tanggal</th><th>Status</th><th>Nominal</th><th>Catatan</th><th>Aksi</th></tr></thead><tbody>'+rowsHtml+'</tbody></table></div>'+
+     '</div>';
+ }).join("");
 }
 
 async function terimaGmailAdmin(id){
