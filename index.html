@@ -273,7 +273,13 @@ button{font:inherit;border:0;cursor:pointer}
   </div>
   <div id="adminWithdrawPanel" style="display:none">
    <div id="adminWithdrawSummary" class="admin-summary"></div>
-   <div class="admin-scroll"><table class="admin-table"><thead><tr><th>Akun</th><th>Jumlah</th><th>Metode</th><th>Tujuan</th><th>Tanggal</th><th>Status</th><th>Catatan</th><th></th></tr></thead><tbody id="adminWithdrawBody"></tbody></table></div>
+   <div id="adminWithdrawFilters" class="history-filters">
+    <button class="history-filter active" onclick="setAdminWithdrawFilter('all')">Semua</button>
+    <button class="history-filter" onclick="setAdminWithdrawFilter('pending')">Menunggu</button>
+    <button class="history-filter" onclick="setAdminWithdrawFilter('success')">Berhasil</button>
+    <button class="history-filter" onclick="setAdminWithdrawFilter('rejected')">Ditolak</button>
+   </div>
+   <div class="admin-scroll"><table class="admin-table"><thead><tr><th>Akun</th><th>Jumlah</th><th>Metode</th><th>Tujuan</th><th>Tanggal</th><th>Status</th><th>Catatan</th><th>Aksi</th></tr></thead><tbody id="adminWithdrawBody"></tbody></table></div>
   </div>
  </div>
 </div>
@@ -848,7 +854,7 @@ async function loadAdminWithdrawals(){
  const ids=[...new Set((data||[]).map(x=>x.user_id).filter(Boolean))];let profiles=[];
  if(ids.length){const r=await supabaseClient.from("profiles").select("id,email").in("id",ids);if(!r.error)profiles=r.data||[]}
  const pmap=Object.fromEntries(profiles.map(p=>[p.id,p.email]));const rows=data||[];
- const pending=rows.filter(x=>x.status==="pending").length,success=rows.filter(x=>x.status==="success").length,rejected=rows.filter(x=>x.status==="rejected").length;
+ const pending=rows.filter(x=>withdrawStatusType(x.status)==="pending").length,success=rows.filter(x=>withdrawStatusType(x.status)==="success").length,rejected=rows.filter(x=>withdrawStatusType(x.status)==="rejected").length;
  document.getElementById("adminWithdrawSummary").innerHTML='<div><span class="admin-small">Menunggu</span><b class="status-pending">'+pending+'</b></div><div><span class="admin-small">Berhasil</span><b class="status-success">'+success+'</b></div><div><span class="admin-small">Ditolak</span><b class="status-rejected">'+rejected+'</b></div>';
  document.querySelectorAll("#adminWithdrawFilters .history-filter").forEach(btn=>{
     const txt=btn.textContent.toLowerCase();
@@ -857,10 +863,10 @@ async function loadAdminWithdrawals(){
   });
   const filteredRows=adminWithdrawFilter==="all"?rows:rows.filter(x=>withdrawStatusType(x.status)===adminWithdrawFilter);
   const body=document.getElementById("adminWithdrawBody");
- if(!rows.length){body.innerHTML='<tr><td colspan="8" class="admin-empty">Belum ada penarikan.</td></tr>';setMessage("adminMessage","#5ce2ae","Belum ada penarikan.");return}
- body.innerHTML=rows.map(r=>`<tr>
+ if(!filteredRows.length){body.innerHTML='<tr><td colspan="8" class="admin-empty">Belum ada penarikan pada kategori ini.</td></tr>';setMessage("adminMessage","#5ce2ae","Tidak ada penarikan pada kategori ini.");return}
+ body.innerHTML=filteredRows.map(r=>`<tr>
  <td>${safe(pmap[r.user_id]||r.user_id)}</td><td><b>${rupiah(r.amount)}</b></td><td>${safe(r.method)}</td><td>${safe(r.destination)}</td><td>${safe(fmtDate(r.created_at))}</td>
- <td><select id="wstatus_${r.id}"><option value="pending" ${r.status==="pending"?"selected":""}>Menunggu</option><option value="success" ${r.status==="success"?"selected":""}>Transfer berhasil</option><option value="rejected" ${r.status==="rejected"?"selected":""}>Ditolak</option></select></td>
+ <td><select id="wstatus_${r.id}"><option value="pending" ${withdrawStatusType(r.status)==="pending"?"selected":""}>Menunggu</option><option value="success" ${withdrawStatusType(r.status)==="success"?"selected":""}>Transfer berhasil</option><option value="rejected" ${withdrawStatusType(r.status)==="rejected"?"selected":""}>Ditolak</option></select></td>
  <td><textarea id="wnote_${r.id}" placeholder="Catatan...">${safe(r.admin_note||"")}</textarea></td><td><button class="admin-save" onclick="simpanWithdrawAdmin(${Number(r.id)})">Simpan</button></td>
  </tr>`).join("");
  setMessage("adminMessage","#5ce2ae","Data penarikan berhasil dimuat.");
