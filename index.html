@@ -141,7 +141,20 @@ button{font:inherit;border:0;cursor:pointer}
     <small style="color:var(--muted)">Harga mengikuti jumlah Gmail yang dikirim.</small>
    </section>
 
-   
+   <section class="card" style="margin-top:16px">
+    <div class="kicker">Saluran informasi</div>
+    <p style="color:var(--muted);font-size:13px;line-height:1.5">Dapatkan update dan informasi terbaru melalui WhatsApp.</p>
+    <button class="btn secondary" style="width:100%" onclick="bukaWhatsApp()">Buka WhatsApp ↗</button>
+   </section>
+  </aside>
+ </div>
+
+ <div class="section-title"><h2>Aktivitas terbaru</h2><span>Riwayat</span></div>
+ <section class="card">
+  <div class="transaction"><div class="tx-icon">✉️</div><div class="tx-main"><b id="gmailActivityTitle">Belum ada pengiriman</b><small id="gmailActivityText">Aktivitas Gmail akan muncul di sini</small></div><div class="tx-value">—</div></div>
+  <div class="transaction"><div class="tx-icon">💳</div><div class="tx-main"><b id="withdrawActivityTitle">Belum ada penarikan</b><small id="withdrawActivityText">Riwayat saldo masih kosong</small></div><div class="tx-value">—</div></div>
+  <button class="btn secondary" style="width:100%;margin-top:12px" onclick="bukaRiwayatGmail()">Lihat Riwayat Gmail</button><button class="btn secondary" style="width:100%;margin-top:8px" onclick="bukaRiwayatPenarikan()">Lihat Riwayat Penarikan</button>
+ </section>
 </section>
 </main>
 
