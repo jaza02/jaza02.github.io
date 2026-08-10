@@ -18,7 +18,7 @@ button{font:inherit;border:0;cursor:pointer}
 .brand h1{font-size:21px;margin:0}.brand p{margin:4px 0 0;color:#ffb66b;font-size:12px;font-weight:800;letter-spacing:1.2px}
 .account-area{margin-left:auto;display:flex;gap:7px}.account-btn{background:#14263b;border:1px solid #29425d;border-radius:20px;padding:9px 12px;color:#cbd7e5}
 .container{width:min(940px,100%);margin:auto;padding:22px 16px}
-.hero{background:linear-gradient(135deg,#122b45,#0d1829);border:1px solid #27425e;border-radius:24px;padding:25px;display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center;margin-bottom:18px}
+.hero{background:linear-gradient(135deg,#122b45,#0d1829);border:1px solid #27425e;border-radius:24px;padding:25px;display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center;margin-bottom:18px}.public-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 0 18px}.public-stat{background:linear-gradient(145deg,#102c35,#0d1a2b);border:1px solid #24584e;border-radius:18px;padding:17px;text-align:center}.public-stat .kicker{font-size:11px}.public-stat .num{font-size:27px;font-weight:900;color:#58e1ad;margin-top:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.public-stat small{display:block;color:var(--muted);font-size:10px;margin-top:5px}
 .hero h2{margin:0 0 8px;font-size:25px}.hero p{margin:0;color:var(--muted);line-height:1.5}.hero-badge{background:#173a35;color:#59e0ae;border:1px solid #236c58;padding:10px 14px;border-radius:14px;font-weight:800;white-space:nowrap}
 .grid{display:grid;grid-template-columns:1.25fr .75fr;gap:16px}.card{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:21px}.balance{background:linear-gradient(145deg,#102c35,#0d1a2b);border-color:#24584e}
 .kicker{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}.money{font-size:38px;font-weight:900;color:#58e1ad;margin:8px 0 18px}.actions{display:flex;gap:10px}.btn{display:block;text-align:center;padding:12px 15px;border-radius:13px;font-weight:800;flex:1}.primary{background:var(--red);color:white}.secondary{background:#17304b;color:#9fc0ff;border:1px solid #294b72}
@@ -41,7 +41,7 @@ button{font:inherit;border:0;cursor:pointer}
 .auth-switch{text-align:center;color:var(--muted);font-size:13px;margin-top:15px}.auth-switch button{background:none;color:#78a1ff;padding:0;font-weight:800}
 .logged-info{font-size:12px;color:#8fa0b5;margin-top:7px}
 @media(max-width:700px){.grid{grid-template-columns:1fr}.hero{grid-template-columns:1fr}.hero-badge{width:max-content}}
-@media(max-width:520px){.container{padding:16px 13px}.top{padding:12px}.logo{width:46px;height:46px}.envelope{width:30px;height:22px}.brand h1{font-size:17px}.brand p{font-size:10px}.account-area{gap:4px}.account-btn{font-size:11px;padding:8px 9px}.hero{padding:20px;border-radius:20px}.hero h2{font-size:22px}.card{padding:18px;border-radius:19px}.stats{gap:12px}.money{font-size:34px}.actions{flex-direction:column}.bottom-nav{bottom:9px}}
+@media(max-width:520px){.public-stats{gap:9px}.public-stat{padding:15px 10px}.public-stat .num{font-size:21px}.container{padding:16px 13px}.top{padding:12px}.logo{width:46px;height:46px}.envelope{width:30px;height:22px}.brand h1{font-size:17px}.brand p{font-size:10px}.account-area{gap:4px}.account-btn{font-size:11px;padding:8px 9px}.hero{padding:20px;border-radius:20px}.hero h2{font-size:22px}.card{padding:18px;border-radius:19px}.stats{gap:12px}.money{font-size:34px}.actions{flex-direction:column}.bottom-nav{bottom:9px}}
 
 .admin-btn{display:none;background:#173d35;border:1px solid #2b705e;border-radius:20px;padding:9px 12px;color:#7ff0c1;font-weight:800}.admin-table{width:100%;border-collapse:collapse;font-size:12px}.admin-table th,.admin-table td{padding:9px 7px;border-bottom:1px solid var(--line);vertical-align:top;text-align:left}.admin-table th{color:#9fc0ff;position:sticky;top:0;background:#0d1a2b}.admin-table input,.admin-table select,.admin-table textarea{width:100%;padding:8px;border-radius:8px;border:1px solid #29425d;background:#102238;color:#fff}.admin-table textarea{min-height:55px;resize:vertical}.status-pending{color:#ffb66b}.status-accepted,.status-success{color:#5ce2ae}.status-rejected{color:#ff8d98}.admin-section{margin-top:18px}.admin-scroll{overflow:auto;border:1px solid var(--line);border-radius:12px}.admin-small{font-size:11px;color:var(--muted);line-height:1.4}.admin-save{padding:8px 10px;border-radius:9px;background:#17304b;color:#9fc0ff;font-weight:800;white-space:nowrap}.admin-tabs{display:flex;gap:8px;margin-bottom:12px}.admin-tabs button{flex:1;padding:10px;border-radius:10px;background:#17304b;color:#9fc0ff}.admin-tabs button.active{background:#24584e;color:#fff}.admin-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:12px}.admin-summary div{background:#102238;border:1px solid var(--line);border-radius:12px;padding:10px}.admin-summary b{display:block;font-size:18px;margin-top:4px}.admin-empty{padding:22px;text-align:center;color:var(--muted)}
 .history-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:12px}
@@ -95,6 +95,11 @@ button{font:inherit;border:0;cursor:pointer}
  <section class="hero">
   <div><h2 id="sapaan">Halo! 👋</h2><p>Kelola aktivitas, saldo, dan riwayat pekerjaanmu dari satu tempat.</p></div>
   <div class="hero-badge" id="accountBadge">○ Belum masuk</div>
+ </section>
+
+ <section class="public-stats" aria-label="Statistik platform">
+  <div class="public-stat"><div class="kicker">Total User Aktif</div><div class="num" id="publicTotalUsers">0</div><small>Pengguna terdaftar</small></div>
+  <div class="public-stat"><div class="kicker">Total Penarikan</div><div class="num" id="publicTotalWithdrawals">Rp 0</div><small>Total pembayaran kepada user</small></div>
  </section>
 
  <section class="card notice">
@@ -337,6 +342,19 @@ function bukaModal(id){document.getElementById(id).style.display="flex"}
 function tutupModal(id){document.getElementById(id).style.display="none"}
 function safe(str){return String(str??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
 function fmtDate(v){if(!v)return "-";try{return new Date(v).toLocaleString("id-ID")}catch(e){return v}}
+
+async function loadPublicStats(){
+ try{
+  const {count:userCount,error:userError}=await supabaseClient.from("profiles").select("id",{count:"exact",head:true});
+  if(userError)throw userError;
+  const {data:withdrawRows,error:withdrawError}=await supabaseClient.from("withdrawals").select("amount").in("status",["success","berhasil","completed","paid"]);
+  if(withdrawError)throw withdrawError;
+  const totalWithdrawals=(withdrawRows||[]).reduce((sum,row)=>sum+Number(row.amount||0),0);
+  const usersEl=document.getElementById("publicTotalUsers"), withdrawalsEl=document.getElementById("publicTotalWithdrawals");
+  if(usersEl)usersEl.textContent=Number(userCount||0).toLocaleString("id-ID");
+  if(withdrawalsEl)withdrawalsEl.textContent=rupiah(totalWithdrawals);
+ }catch(error){console.warn("Gagal memuat statistik publik:",error)}
+}
 
 async function ensureProfile(){
  if(!currentUser)return null;
@@ -917,7 +935,9 @@ supabaseClient.auth.onAuthStateChange((event,session)=>{
  if(event==="SIGNED_IN"||event==="SIGNED_OUT"||event==="TOKEN_REFRESHED")loadUser();
 });
 
+loadPublicStats();
 loadUser();
+setInterval(loadPublicStats,30000);
 </script>
 </body>
 </html>
