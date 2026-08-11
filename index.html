@@ -186,10 +186,10 @@ button{font:inherit;border:0;cursor:pointer}
    </div>
 
    <section class="card task">
-    <div class="task-head"><h3>Mulai pekerjaan</h3><span class="tag">TERSEDIA</span></div>
+    <div class="task-head"><h3>Mulai pekerjaan</h3><span class="tag" id="gmailScheduleTag">TERSEDIA</span></div>
     <p>Setorkan Gmail sebanyak yang Anda punya. Tidak ada batas jumlah Gmail dalam satu setoran.</p>
     <div class="progress"><div class="bar" id="progressBar"></div></div>
-    <button class="btn primary" style="margin-top:16px;width:100%" onclick="bukaGmail()">Mulai Stor Gmail →</button>
+    <button id="startGmailBtn" class="btn primary" style="margin-top:16px;width:100%" onclick="bukaGmail()">Mulai Stor Gmail →</button>
    </section>
   </div>
 
@@ -606,8 +606,41 @@ function tambahGmail(){
  updateSetoranTotal();
  input.focus();
 }
+
+function getJakartaMinutes(){
+ const parts=new Intl.DateTimeFormat("en-GB",{
+  timeZone:"Asia/Jakarta",hour:"2-digit",minute:"2-digit",hour12:false
+ }).formatToParts(new Date());
+ const h=Number(parts.find(p=>p.type==="hour")?.value||0);
+ const m=Number(parts.find(p=>p.type==="minute")?.value||0);
+ return h*60+m;
+}
+function isGmailSubmissionOpen(){
+ const minutes=getJakartaMinutes();
+ return minutes>=420 && minutes<960; // 07:00 inclusive through 15:59 WIB
+}
+function updateGmailScheduleUI(){
+ const open=isGmailSubmissionOpen();
+ const btn=document.getElementById("startGmailBtn");
+ const tag=document.getElementById("gmailScheduleTag");
+ if(btn){
+  btn.disabled=!open;
+  btn.style.opacity=open?"1":"0.55";
+  btn.style.cursor=open?"pointer":"not-allowed";
+  btn.textContent=open?"Mulai Stor Gmail →":"🔒 Stor Gmail ditutup";
+ }
+ if(tag){
+  tag.textContent=open?"TERSEDIA":"DITUTUP";
+ }
+}
+
 function bukaGmail(){
  if(!currentUser){bukaLogin();return}
+ if(!isGmailSubmissionOpen()){
+  updateGmailScheduleUI();
+  alert("Setoran Gmail ditutup. Silakan kirim Gmail kembali mulai pukul 07.00 WIB sampai sebelum pukul 16.00 WIB.");
+  return;
+ }
  document.getElementById("gmailMessage").textContent="";
  document.getElementById("gmailBulkInput").value="";
  document.getElementById("submitterWhatsApp").value=submitterWhatsApp||"";
@@ -622,6 +655,12 @@ document.addEventListener("input",function(e){
 
 async function kirimSemuaGmail(){
  if(!currentUser){bukaLogin();return}
+ if(!isGmailSubmissionOpen()){
+  updateGmailScheduleUI();
+  const msg=document.getElementById("gmailMessage");
+  if(msg){msg.style.color="#ff6b6b";msg.textContent="Setoran Gmail sedang ditutup. Jam setoran: 07.00–16.00 WIB."}
+  return;
+ }
  const emails=parseBulkGmail().map(v=>v.toLowerCase());
  const wa=document.getElementById("submitterWhatsApp").value.trim();
  const msg=document.getElementById("gmailMessage");
@@ -1118,9 +1157,11 @@ supabaseClient.auth.onAuthStateChange((event,session)=>{
  if(event==="SIGNED_IN"||event==="SIGNED_OUT"||event==="TOKEN_REFRESHED")loadUser();
 });
 
+updateGmailScheduleUI();
 loadPublicPlatformStats();
 loadUser();
 setInterval(loadPublicPlatformStats,30000);
+setInterval(updateGmailScheduleUI,30000);
 </script>
 </body>
 </html>
