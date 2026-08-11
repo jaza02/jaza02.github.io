@@ -115,6 +115,14 @@ button{font:inherit;border:0;cursor:pointer}
 .folder-gmail-actions{display:flex;gap:5px;flex-wrap:wrap}
 .folder-gmail-note{margin-top:5px;color:#b9c7d8;font-size:10px}
 .whatsapp-send{white-space:nowrap}
+
+.public-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:16px 0}
+.public-stat-card{padding:18px;text-align:center;border:1px solid #24584e;border-radius:20px;background:#102c35;box-shadow:0 8px 24px #0002}
+.public-stat-card .kicker{margin-bottom:8px}
+.public-stat-number{font-size:31px;font-weight:900;color:#58e1ad;line-height:1.15}
+.public-stat-note{margin-top:7px;color:var(--muted);font-size:12px}
+@media(max-width:520px){.public-stats{gap:10px}.public-stat-card{padding:15px}.public-stat-number{font-size:26px}}
+
 @media(max-width:520px){
  .folder-summary>div{display:block}
  .folder-summary>div>span:first-child{display:block;min-width:0;margin-bottom:2px}
@@ -149,6 +157,19 @@ button{font:inherit;border:0;cursor:pointer}
  <section class="card notice">
   <div class="notice-icon">⏱</div>
   <div><b>Informasi penarikan saldo</b><p>Penarikan saldo tersedia setiap Selasa–Sabtu, pukul 16:00–20:00. Minggu dan Senin tidak tersedia. Pastikan data tujuan sudah benar sebelum mengajukan penarikan.</p></div>
+ </section>
+
+ <section class="public-stats" aria-label="Statistik publik">
+  <section class="public-stat-card">
+   <div class="kicker">TOTAL USER AKTIF</div>
+   <div class="public-stat-number" id="publicTotalUsers">0</div>
+   <div class="public-stat-note">Pengguna terdaftar</div>
+  </section>
+  <section class="public-stat-card">
+   <div class="kicker">TOTAL PENARIKAN</div>
+   <div class="public-stat-number" id="publicTotalWithdrawals">Rp 0</div>
+   <div class="public-stat-note">Total pembayaran kepada user</div>
+  </section>
  </section>
 
  <div class="grid">
@@ -409,6 +430,22 @@ async function checkAdmin(){
  return isAdmin;
 }
 
+
+async function loadPublicStats(){
+  const usersEl=document.getElementById("publicTotalUsers");
+  const withdrawalsEl=document.getElementById("publicTotalWithdrawals");
+  if(!usersEl||!withdrawalsEl)return;
+  try{
+    const {data,error}=await supabaseClient.rpc("get_public_platform_stats");
+    if(error)throw error;
+    const row=Array.isArray(data)?(data[0]||{}):(data||{});
+    usersEl.textContent=Number(row.total_users||0).toLocaleString("id-ID");
+    withdrawalsEl.textContent=rupiah(row.total_withdrawals||0);
+  }catch(error){
+    console.error("Statistik publik gagal dimuat:",error);
+  }
+}
+
 async function loadUser(){
  const {data:{session},error:sessionError}=await supabaseClient.auth.getSession();
  if(sessionError)console.error(sessionError);
@@ -492,6 +529,8 @@ async function register(){
   currentUser=data.user;
   try{await ensureProfile()}catch(e){console.error(e)}
   await loadUser();
+loadPublicStats();
+setInterval(loadPublicStats,30000);
   msg.style.color="#5ce2ae";msg.textContent="Akun berhasil dibuat.";
   setTimeout(()=>tutupModal("registerModal"),500);
  }else{
