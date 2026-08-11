@@ -34,6 +34,7 @@ button{font:inherit;border:0;cursor:pointer}
 .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.modal-header h2{margin:0;font-size:21px}.close{width:38px;height:38px;border-radius:10px;background:#182c43;color:#fff;font-size:25px}
 .modal label{display:block;margin:14px 0 7px;color:var(--muted);font-size:13px}.modal input,.modal select{width:100%;padding:13px;border-radius:11px;border:1px solid #29425d;background:#102238;color:#fff;outline:none}.modal-submit{width:100%;padding:13px;margin-top:18px;border-radius:12px;background:var(--red);color:#fff;font-weight:800}.google-btn{width:100%;padding:13px;margin-top:10px;border-radius:12px;background:#fff;color:#202124;font-weight:800;border:1px solid #dadce0}.google-note{font-size:11px;color:var(--muted);line-height:1.45;margin-top:9px;text-align:center}.message{text-align:center;font-size:13px;margin-top:12px;line-height:1.4}
 .gmail-list{display:flex;flex-direction:column;gap:9px;margin-top:10px}.gmail-row{display:flex;gap:8px;align-items:center}.gmail-no{width:34px;text-align:center;color:var(--muted);font-weight:800}.gmail-row input{flex:1}.remove-gmail{width:42px;height:42px;border-radius:10px;background:#351d25;color:#ff8d98}
+.gmail-bulk-input{width:100%;min-height:260px;resize:vertical;padding:15px;border-radius:14px;border:1px solid #29425d;background:#102238;color:#fff;outline:none;font:inherit;line-height:1.65;white-space:pre-wrap}.gmail-bulk-input:focus{border-color:#5b8cff;box-shadow:0 0 0 2px rgba(91,140,255,.12)}.bulk-gmail-note{margin:4px 0 9px;color:var(--muted);font-size:12px;line-height:1.5}.bulk-gmail-note b{color:#9fc0ff}
 .add-btn{width:100%;padding:12px;border-radius:12px;background:#17304b;border:1px dashed #416487;color:#9fc0ff;font-weight:800;margin-top:10px}
 .total-box{margin-top:15px;padding:14px;border-radius:14px;background:#102c35;border:1px solid #24584e;display:flex;justify-content:space-between;align-items:center}.total-box span{color:var(--muted);font-size:13px}.total-box strong{font-size:23px;color:#58e1ad}
 .whatsapp-box{margin-top:15px;padding-top:14px;border-top:1px solid var(--line)}
@@ -265,10 +266,13 @@ button{font:inherit;border:0;cursor:pointer}
 <div id="gmailModal" class="modal">
  <div class="modal-box">
   <div class="modal-header"><h2>Stor Gmail</h2><button class="close" onclick="tutupModal('gmailModal')">×</button></div>
-  <div class="info-box"><span>Total Gmail dalam setoran ini</span><strong id="setoranTotal">1 Gmail</strong></div>
-  <label>Daftar Gmail</label>
-  <div id="gmailList" class="gmail-list"></div>
-  <button class="add-btn" onclick="tambahGmail()">＋ Tambah Gmail</button>
+  <div class="info-box"><span>Total Gmail dalam setoran ini</span><strong id="setoranTotal">0 Gmail</strong></div>
+  <label for="gmailBulkInput">Masukkan semua Gmail di sini</label>
+  <div class="bulk-gmail-note">Satu Gmail per baris. Anda bisa langsung <b>copy-paste</b> banyak Gmail sekaligus.</div>
+  <textarea id="gmailBulkInput" class="gmail-bulk-input" rows="12" placeholder="Gsiers@gmail.com
+Jsgei@gmail.com
+Jstuei@gmail.com
+dan seterusnya..."></textarea>
 
   <div class="whatsapp-box">
    <label>Kontak WhatsApp penyetor</label>
@@ -554,37 +558,46 @@ async function ajukanPenarikan(){
 }
 
 function bukaDetail(){if(!currentUser){bukaLogin();return}updateTampilan();bukaModal("detailModal")}
-function buatBarisGmail(index,value=""){
- const row=document.createElement("div");row.className="gmail-row";
- row.innerHTML='<div class="gmail-no">'+index+'</div><input type="email" class="gmail-input" placeholder="alamat@gmail.com"><button class="remove-gmail" type="button" title="Hapus">×</button>';
- row.querySelector(".gmail-input").value=value;
- row.querySelector(".remove-gmail").onclick=function(){row.remove();renumberGmail()};
- row.querySelector(".gmail-input").addEventListener("input",updateSetoranTotal);
- document.getElementById("gmailList").appendChild(row);
+function parseBulkGmail(){
+ const raw=document.getElementById("gmailBulkInput")?.value||"";
+ return raw.split(/\r?\n/).map(v=>v.trim()).filter(Boolean);
 }
-function renumberGmail(){document.querySelectorAll("#gmailList .gmail-row").forEach((row,i)=>row.querySelector(".gmail-no").textContent=i+1);updateSetoranTotal()}
-function updateSetoranTotal(){document.getElementById("setoranTotal").textContent=document.querySelectorAll("#gmailList .gmail-row").length+" Gmail"}
-function tambahGmail(){buatBarisGmail(document.querySelectorAll("#gmailList .gmail-row").length+1);updateSetoranTotal()}
+function updateSetoranTotal(){
+ const count=parseBulkGmail().length;
+ document.getElementById("setoranTotal").textContent=count+" Gmail";
+}
+function tambahGmail(){
+ const input=document.getElementById("gmailBulkInput");
+ if(!input)return;
+ const lines=parseBulkGmail();
+ input.value+=(lines.length?"\n":"")+"alamat@gmail.com";
+ updateSetoranTotal();
+ input.focus();
+}
 function bukaGmail(){
  if(!currentUser){bukaLogin();return}
  document.getElementById("gmailMessage").textContent="";
- document.getElementById("gmailList").innerHTML="";
- buatBarisGmail(1);
+ document.getElementById("gmailBulkInput").value="";
  document.getElementById("submitterWhatsApp").value=submitterWhatsApp||"";
- updateSetoranTotal();bukaModal("gmailModal");setNav("navGmail");
+ updateSetoranTotal();
+ bukaModal("gmailModal");setNav("navGmail");
+ setTimeout(()=>document.getElementById("gmailBulkInput")?.focus(),100);
 }
+
+document.addEventListener("input",function(e){
+ if(e.target&&e.target.id==="gmailBulkInput")updateSetoranTotal();
+});
 
 async function kirimSemuaGmail(){
  if(!currentUser){bukaLogin();return}
- const inputs=[...document.querySelectorAll(".gmail-input")];
- const emails=inputs.map(i=>i.value.trim().toLowerCase()).filter(Boolean);
+ const emails=parseBulkGmail().map(v=>v.toLowerCase());
  const wa=document.getElementById("submitterWhatsApp").value.trim();
  const msg=document.getElementById("gmailMessage");
- if(emails.length===0){msg.style.color="#ff6b6b";msg.textContent="Masukkan minimal 1 Gmail.";return}
- for(const email of emails){if(!/^[^\s@]+@gmail\.com$/i.test(email)){msg.style.color="#ff6b6b";msg.textContent="Ada alamat yang bukan Gmail atau formatnya salah.";return}}
+ if(emails.length===0){msg.style.color="#ff6b6b";msg.textContent="Masukkan minimal 1 Gmail, satu Gmail per baris.";return}
+ for(const email of emails){if(!/^[^\s@]+@gmail\.com$/i.test(email)){msg.style.color="#ff6b6b";msg.textContent="Ada alamat yang bukan Gmail atau formatnya salah: "+email;return}}
  if(!wa){msg.style.color="#ff6b6b";msg.textContent="Masukkan kontak WhatsApp penyetor.";return}
  const unique=[...new Set(emails)];if(unique.length!==emails.length){msg.style.color="#ff6b6b";msg.textContent="Ada Gmail yang sama dalam setoran ini.";return}
- msg.style.color="#8fa0b5";msg.textContent="Menyimpan Gmail...";
+ msg.style.color="#8fa0b5";msg.textContent="Menyimpan "+emails.length+" Gmail...";
  const rows=emails.map(email=>({user_id:currentUser.id,gmail:email,submitter_whatsapp:wa,status:"pending",amount:0}));
  const {error}=await supabaseClient.from("gmail_submissions").insert(rows);
  if(error){msg.style.color="#ff6b6b";msg.textContent=error.message;return}
