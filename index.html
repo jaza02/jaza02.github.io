@@ -60,15 +60,6 @@ button{font:inherit;border:0;cursor:pointer}
 .admin-user-group-table th{color:#8fa0b5;font-weight:800;background:#102238}
 .admin-user-group-table tr:last-child td{border-bottom:0}
 .admin-user-group-table td:first-child{word-break:break-all}
- .admin-user-group-head{cursor:pointer;user-select:none;position:relative}
-.admin-user-group-head:hover{filter:brightness(1.08)}
-.admin-user-group-head:active{filter:brightness(.98)}
-.admin-user-group-arrow{font-size:16px;min-width:20px;transition:transform .18s ease;display:inline-block}
-.admin-user-group.collapsed .admin-user-group-arrow{transform:rotate(-90deg)}
-.admin-user-group-body{display:block}
-.admin-user-group.collapsed .admin-user-group-body{display:none}
-.admin-user-group-tools{display:flex;align-items:center;gap:7px;flex-wrap:wrap;justify-content:flex-end}
-.admin-user-group-wa{background:#167b52;color:#fff;border:0}
 
 .history-item{padding:12px;border:1px solid var(--line);border-radius:13px;background:#102238}
 .history-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
@@ -82,6 +73,29 @@ button{font:inherit;border:0;cursor:pointer}
 .withdraw-status-rejected{color:#ff6b6b}
 
 @media(max-width:520px){.history-summary{gap:6px}.history-summary div{padding:9px}.history-filter{min-width:90px}}
+.folder-summary{padding:12px 13px;background:#0e1d2e}
+.folder-summary>div{display:flex;gap:8px;align-items:flex-start;margin-bottom:8px;line-height:1.45}
+.folder-summary>div:last-child{margin-bottom:0}
+.folder-summary>div>span:first-child{color:#8fa0b5;font-weight:800;min-width:120px}
+.folder-summary>div>b{color:#fff;word-break:break-word}
+.folder-label{margin-top:4px;color:#9fc0ff;font-size:11px;font-weight:700}
+.folder-status-summary{display:flex;gap:8px;flex-wrap:wrap}
+.folder-gmail-heading{display:flex!important;justify-content:space-between;align-items:center!important}
+.folder-gmail-list{list-style:none;margin:2px 0 0;padding:0 0 0 128px}
+.folder-gmail-item{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.folder-gmail-item:last-child{border-bottom:0}
+.folder-gmail-address{font-weight:800;color:#fff;word-break:break-all}
+.folder-gmail-meta{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:5px;font-size:10px;color:#8fa0b5}
+.folder-gmail-actions{display:flex;gap:5px;flex-wrap:wrap}
+.folder-gmail-note{margin-top:5px;color:#b9c7d8;font-size:10px}
+.whatsapp-send{white-space:nowrap}
+@media(max-width:520px){
+ .folder-summary>div{display:block}
+ .folder-summary>div>span:first-child{display:block;min-width:0;margin-bottom:2px}
+ .folder-gmail-list{padding-left:0}
+ .folder-gmail-heading{display:flex!important}
+}
+
 </style>
 </head>
 <body>
@@ -337,6 +351,7 @@ let isAdmin=false;
 let adminTab="gmail";
 let adminGmailFilter="all";
 let adminWithdrawFilter="all";
+let adminGmailCache=[];
 let userGmailFilter="all";
 let userWithdrawFilter="all";
 let withdrawHistory=[];
@@ -710,7 +725,7 @@ async function loadAdminGmail(){
    .select("id,user_id,gmail,submitter_whatsapp,created_at,status,amount,reviewed_at,admin_note")
    .order("created_at",{ascending:false});
  if(error){setMessage("adminMessage","#ff6b6b",error.message);return}
- window._adminGmailRows=rows||[];
+ adminGmailCache=rows||[];
 
  const filterButtons=document.querySelectorAll("#adminGmailFilters .history-filter");
  filterButtons.forEach(btn=>{
@@ -752,6 +767,14 @@ async function loadAdminGmail(){
    groups.get(key).push(r);
  });
 
+ const profileIds=[...groups.keys()].filter(id=>id&&id!=="unknown");
+ const profileMap=new Map();
+ if(profileIds.length){
+   const {data:profiles}=await supabaseClient.from("profiles").select("id,email,whatsapp").in("id",profileIds);
+   (profiles||[]).forEach(p=>profileMap.set(p.id,p));
+ }
+ adminGmailCache=(adminGmailCache||[]).map(r=>({...r,user_email:profileMap.get(r.user_id)?.email||""}));
+
  const sortedGroups=[...groups.entries()].sort((x,y)=>{
    const ax=String(x[1][0]?.submitter_whatsapp||x[0]);
    const by=String(y[1][0]?.submitter_whatsapp||y[0]);
@@ -759,125 +782,71 @@ async function loadAdminGmail(){
  });
 
  wrap.innerHTML=sortedGroups.map(([userId,list],idx)=>{
-   const label=list[0]?.submitter_whatsapp ? "Penyetor: "+safe(list[0].submitter_whatsapp) : "User ID: "+safe(userId);
-   const folderId="gmailFolder_"+idx;
-   const jsUserId=JSON.stringify(String(userId)).replace(/"/g,"&quot;");
-   const rowsHtml=list.map(r=>{
+   const profile=profileMap.get(userId)||{};
+   const accountEmail=profile.email||"—";
+   const whatsapp=profile.whatsapp||list[0]?.submitter_whatsapp||"—";
+   const acceptedCount=list.filter(r=>["accepted","diterima"].includes(String(r.status||"").toLowerCase())).length;
+   const rejectedCount=list.filter(r=>["rejected","ditolak"].includes(String(r.status||"").toLowerCase())).length;
+   const pendingCount=list.length-acceptedCount-rejectedCount;
+   const statusSummary=(acceptedCount?'<span class="status-accepted">'+acceptedCount+' Diterima</span> ':'')+
+     (pendingCount?'<span class="status-pending">'+pendingCount+' Menunggu</span> ':'')+
+     (rejectedCount?'<span class="status-rejected">'+rejectedCount+' Ditolak</span>':'');
+   const gmailItems=list.map((r,i)=>{
      const s=String(r.status||"").toLowerCase();
      const type=(s==="accepted"||s==="diterima")?"accepted":(s==="rejected"||s==="ditolak")?"rejected":"pending";
-     const statusLabel=type==="accepted"?"Diterima":type==="rejected"?"Ditolak":"Menunggu review";
+     const statusLabel=type==="accepted"?"Diterima":type==="rejected"?"Ditolak":"Menunggu";
      const statusClass=type==="accepted"?"status-accepted":type==="rejected"?"status-rejected":"status-pending";
-     return '<tr>'+
-       '<td><b>'+safe(r.gmail)+'</b></td>'+
-       '<td>'+safe(r.submitter_whatsapp||"—")+'</td>'+
-       '<td>'+safe(fmtDate(r.created_at))+'</td>'+
-       '<td><span class="'+statusClass+'">'+statusLabel+'</span></td>'+
-       '<td>'+rupiah(Number(r.amount||0))+'</td>'+
-       '<td>'+safe(r.admin_note||"—")+'</td>'+
-       '<td><div style="display:flex;gap:5px;flex-wrap:wrap">'+
-         (type==="pending" ? '<button class="btn small" onclick="terimaGmailAdmin('+Number(r.id)+')">Terima</button><button class="btn small danger" onclick="tolakGmailAdmin('+Number(r.id)+')">Tolak</button>' : '<span class="admin-small">Sudah diproses</span>')+
-       '</div></td>'+
-       '</tr>';
+     const action=type==="pending"?
+       '<span class="folder-gmail-actions">'+
+       '<button class="btn small" onclick="terimaGmailAdmin('+Number(r.id)+')">Terima</button>'+
+       '<button class="btn small danger" onclick="tolakGmailAdmin('+Number(r.id)+')">Tolak</button>'+
+       '</span>':
+       '<span class="admin-small">'+statusLabel+'</span>';
+     return '<li class="folder-gmail-item">'+
+       '<div class="folder-gmail-address">'+safe(r.gmail)+'</div>'+
+       '<div class="folder-gmail-meta"><span>'+safe(fmtDate(r.created_at))+'</span>'+action+'</div>'+
+       (r.admin_note?'<div class="folder-gmail-note">Catatan: '+safe(r.admin_note)+'</div>':'')+
+       '</li>';
    }).join("");
-   return '<div class="admin-user-group collapsed" id="'+folderId+'">'+
-     '<div class="admin-user-group-head" onclick="toggleGmailFolder(\''+folderId+'\')" title="Klik untuk membuka/menutup folder">'+
-       '<div style="display:flex;align-items:center;gap:9px;min-width:0">'+
-         '<span class="admin-user-group-arrow">▼</span>'+
-         '<div class="admin-user-group-title">📁 '+safe("Folder "+(idx+1)+" — "+label)+'</div>'+
-       '</div>'+
-       '<div class="admin-user-group-tools" onclick="event.stopPropagation()">'+
-         '<div class="admin-user-group-count">'+list.length+' Gmail</div>'+
-         (list[0]?.submitter_whatsapp ? '<button class="btn small admin-user-group-wa" onclick="kirimSetoranGrupKeWhatsApp('+jsUserId+')">📲 Kirim semua</button>' : '')+
-       '</div>'+
-     '</div>'+
-     '<div class="admin-user-group-body">'+
-       '<div class="admin-scroll"><table class="admin-user-group-table"><thead><tr><th>Gmail</th><th>WhatsApp</th><th>Tanggal</th><th>Status</th><th>Nominal</th><th>Catatan</th><th>Aksi</th></tr></thead><tbody>'+rowsHtml+'</tbody></table></div>'+
+   return '<div class="admin-user-group">'+
+     '<div class="admin-user-group-head"><div><div class="admin-user-group-title">📁 Folder '+(idx+1)+'</div><div class="folder-label">Akun penyetor: <b>'+safe(accountEmail)+'</b></div></div><div class="admin-user-group-count">'+list.length+' Gmail</div></div>'+
+     '<div class="folder-summary">'+
+       '<div><span>Akun penyetor :</span><b>'+safe(userId)+'</b></div>'+
+       '<div><span>Nomor WhatsApp:</span><b>'+safe(whatsapp)+'</b></div>'+
+       '<div><span>Status :</span><b class="folder-status-summary">'+(statusSummary||'—')+'</b></div>'+
+       '<div class="folder-gmail-heading"><span>Gmail :</span><button class="btn small whatsapp-send" onclick="kirimFolderWhatsApp('+JSON.stringify(userId)+')">📲 Kirim semua</button></div>'+
+       '<ul class="folder-gmail-list">'+gmailItems+'</ul>'+
      '</div>'+
      '</div>';
  }).join("");
-
- window._adminGmailGroups=groups;
 }
 
-function toggleGmailFolder(folderId){
- const el=document.getElementById(folderId);
- if(el)el.classList.toggle("collapsed");
+function normalizeWhatsAppNumber(v){
+ const raw=String(v||"").replace(/[^0-9+]/g,"");
+ if(!raw)return"";
+ if(raw.startsWith("+"))return raw.slice(1);
+ if(raw.startsWith("0"))return "62"+raw.slice(1);
+ if(raw.startsWith("62"))return raw;
+ return raw;
 }
 
-function kirimSetoranGrupKeWhatsApp(userId){
- if(!isAdmin){alert("Akses Admin ditolak.");return;}
- const rows=(window._adminGmailRows||[]).filter(r=>String(r.user_id||"")===String(userId||""));
- if(!rows.length){alert("Data Gmail untuk akun ini tidak ditemukan. Silakan refresh Panel Admin.");return;}
- const phone=String(rows[0].submitter_whatsapp||"").replace(/[^0-9]/g,"");
- if(!phone){alert("Nomor WhatsApp penyetor belum tersedia.");return;}
- let wa=phone;
- if(wa.startsWith("0"))wa="62"+wa.slice(1);
- if(!wa.startsWith("62")){alert("Nomor WhatsApp harus menggunakan nomor Indonesia, contoh 08xxxxxxxxxx.");return;}
- const statusLabel=r=>{const s=String(r.status||"").toLowerCase();return (s==="accepted"||s==="diterima")?"Diterima":(s==="rejected"||s==="ditolak")?"Ditolak":"Menunggu pemeriksaan"};
- const lines=rows.map((r,i)=>`${i+1}. ${r.gmail||"-"} — ${statusLabel(r)}`);
+function kirimFolderWhatsApp(userId){
+ if(!isAdmin){setMessage("adminMessage","#ff6b6b","Akses Admin ditolak.");return}
+ const rows=adminGmailCache.filter(r=>(r.user_id||"unknown")===userId);
+ if(!rows.length){setMessage("adminMessage","#ff6b6b","Data Gmail folder tidak ditemukan.");return}
+ const profileRows=rows[0];
+ const accountEmail=profileRows?.user_email||"";
+ const whatsapp=profileRows?.submitter_whatsapp||"";
+ const target=prompt("Masukkan nomor WhatsApp tujuan admin (contoh 081234567890):","");
+ if(target===null)return;
+ const phone=normalizeWhatsAppNumber(target);
+ if(!phone){setMessage("adminMessage","#ff6b6b","Nomor WhatsApp tujuan belum diisi.");return}
  const accepted=rows.filter(r=>["accepted","diterima"].includes(String(r.status||"").toLowerCase())).length;
  const rejected=rows.filter(r=>["rejected","ditolak"].includes(String(r.status||"").toLowerCase())).length;
  const pending=rows.length-accepted-rejected;
- const message=[
-   "🔔 REKAP SETORAN GMAIL",
-   "",
-   "Penyetor: "+(rows[0].submitter_whatsapp||"-"),
-   "Total Gmail: "+rows.length,
-   "Diterima: "+accepted,
-   "Menunggu: "+pending,
-   "Ditolak: "+rejected,
-   "",
-   "Daftar Gmail:",
-   ...lines,
-   "",
-   "Waktu rekap: "+fmtDate(new Date().toISOString())
- ].join("\n");
- window.open("https://wa.me/"+wa+"?text="+encodeURIComponent(message),"_blank","noopener");
-}
-
-
-
-function kirimSetoranKeWhatsApp(id){
-  if(!isAdmin){
-    alert("Akses Admin ditolak.");
-    return;
-  }
-
-  const rows=window._adminGmailRows||[];
-  const row=rows.find(r=>Number(r.id)===Number(id));
-  if(!row){
-    alert("Data setoran tidak ditemukan. Silakan refresh Panel Admin.");
-    return;
-  }
-
-  const phone=String(row.submitter_whatsapp||"").replace(/[^0-9]/g,"");
-  if(!phone){
-    alert("Nomor WhatsApp penyetor belum tersedia.");
-    return;
-  }
-
-  let wa=phone;
-  if(wa.startsWith("0"))wa="62"+wa.slice(1);
-  if(!wa.startsWith("62")){
-    alert("Nomor WhatsApp harus menggunakan nomor Indonesia, contoh 08xxxxxxxxxx.");
-    return;
-  }
-
-  const email=row.gmail||"-";
-  const status=String(row.status||"pending").toLowerCase();
-  const statusLabel=(status==="accepted"||status==="diterima")?"Diterima":(status==="rejected"||status==="ditolak")?"Ditolak":"Menunggu pemeriksaan";
-  const message=[
-    "🔔 SETORAN GMAIL",
-    "",
-    "Gmail: "+email,
-    "Jumlah: 1 Gmail",
-    "Penyetor: "+(row.submitter_whatsapp||"-"),
-    "Waktu: "+fmtDate(row.created_at),
-    "Status: "+statusLabel,
-    row.amount ? "Nominal: "+rupiah(Number(row.amount)) : ""
-  ].filter(Boolean).join("\n");
-
-  window.open("https://wa.me/"+wa+"?text="+encodeURIComponent(message),"_blank");
+ const lines=rows.map((r,i)=>((i+1)+". "+r.gmail)).join("\n");
+ const msg="📁 REKAP SETORAN GMAIL\n\nAkun penyetor: "+(accountEmail||"—")+"\nNomor WhatsApp: "+(whatsapp||"—")+"\nStatus: "+accepted+" Diterima, "+pending+" Menunggu, "+rejected+" Ditolak\n\nGmail:\n"+lines;
+ window.open("https://wa.me/"+phone+"?text="+encodeURIComponent(msg),"_blank");
 }
 
 async function terimaGmailAdmin(id){
