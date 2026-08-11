@@ -69,6 +69,12 @@ button{font:inherit;border:0;cursor:pointer}
 .admin-withdraw-summary>div{padding:8px 9px;border:1px solid rgba(255,255,255,.07);border-radius:10px;background:#0d1a2b}
 .admin-withdraw-summary span{display:block;font-size:10px;color:#8fa0b5;margin-bottom:3px}
 .admin-withdraw-summary b{font-size:14px}
+.admin-withdraw-balance{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:0 0 12px}
+.admin-withdraw-balance>div{padding:10px;border:1px solid rgba(92,226,174,.18);border-radius:11px;background:#0b1929}
+.admin-withdraw-balance span{display:block;font-size:10px;color:#8fa0b5;margin-bottom:4px}
+.admin-withdraw-balance b{font-size:15px;color:#5ce2ae;word-break:break-word}
+.admin-withdraw-total{margin:0 0 12px;padding:10px 11px;border-radius:11px;background:#0d1a2b;border:1px solid rgba(159,192,255,.14);font-size:11px;color:#b9c7d8;line-height:1.5}
+.admin-withdraw-total b{color:#fff}
 .admin-withdraw-item{padding:12px;border:1px solid rgba(255,255,255,.08);border-radius:13px;background:#0d1a2b;margin-top:10px}
 .admin-withdraw-item:first-child{margin-top:0}
 .admin-withdraw-line{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
@@ -754,20 +760,14 @@ async function loadAdminGmail(){
    btn.classList.toggle("active",key===adminGmailFilter);
  });
 
- // Folder selalu memuat SEMUA Gmail milik akun penyetor.
- // Filter hanya menentukan folder mana yang ditampilkan.
- const allRows=rows||[];
- const folderRowsByFilter=adminGmailFilter==="all"?allRows:allRows.filter(r=>{
+ const normalized=adminGmailFilter==="all"?rows:(rows||[]).filter(r=>{
    const s=String(r.status||"").toLowerCase();
    const t=(s==="accepted"||s==="diterima")?"accepted":(s==="rejected"||s==="ditolak")?"rejected":"pending";
    return t===adminGmailFilter;
  });
- const visibleUserIds=new Set(folderRowsByFilter.map(r=>r.user_id||"unknown"));
- const normalized=adminGmailFilter==="all"
-   ? allRows
-   : allRows.filter(r=>visibleUserIds.has(r.user_id||"unknown"));
 
  const summary=document.getElementById("adminGmailSummary");
+ const allRows=rows||[];
  const p=allRows.filter(r=>{const s=String(r.status||"").toLowerCase();return !(s==="accepted"||s==="diterima"||s==="rejected"||s==="ditolak")}).length;
  const a=allRows.filter(r=>["accepted","diterima"].includes(String(r.status||"").toLowerCase())).length;
  const d=allRows.filter(r=>["rejected","ditolak"].includes(String(r.status||"").toLowerCase())).length;
@@ -944,14 +944,30 @@ async function loadAdminWithdrawals(){
  setMessage("adminMessage","#8fa0b5","Memuat penarikan...");
  const {data,error}=await supabaseClient.from("withdrawals").select("id,user_id,amount,method,destination,status,created_at,admin_note,processed_at").order("created_at",{ascending:false});
  if(error){setMessage("adminMessage","#ff6b6b",error.message);return}
- const ids=[...new Set((data||[]).map(x=>x.user_id).filter(Boolean))];let profiles=[];
- if(ids.length){const r=await supabaseClient.from("profiles").select("id,email").in("id",ids);if(!r.error)profiles=r.data||[]}
- const pmap=Object.fromEntries(profiles.map(p=>[p.id,p.email]));
  const rows=data||[];
+ const ids=[...new Set(rows.map(x=>x.user_id).filter(Boolean))];
+ let profiles=[];
+ const allProfiles=await supabaseClient.from("profiles").select("id,email,saldo");
+ if(!allProfiles.error){
+   profiles=allProfiles.data||[];
+ }else if(ids.length){
+   const r=await supabaseClient.from("profiles").select("id,email,saldo").in("id",ids);
+   if(!r.error)profiles=r.data||[];
+ }
+ const pmap=Object.fromEntries(profiles.map(p=>[p.id,p]));
  const pending=rows.filter(x=>withdrawStatusType(x.status)==="pending").length;
  const success=rows.filter(x=>withdrawStatusType(x.status)==="success").length;
  const rejected=rows.filter(x=>withdrawStatusType(x.status)==="rejected").length;
- document.getElementById("adminWithdrawSummary").innerHTML='<div><span class="admin-small">Menunggu</span><b class="status-pending">'+pending+'</b></div><div><span class="admin-small">Berhasil</span><b class="status-success">'+success+'</b></div><div><span class="admin-small">Ditolak</span><b class="status-rejected">'+rejected+'</b></div>';
+ const totalCurrentBalance=profiles.reduce((sum,p)=>sum+Number(p.saldo||0),0);
+ const totalSuccessfulPaid=rows.filter(x=>withdrawStatusType(x.status)==="success").reduce((sum,r)=>sum+Number(r.amount||0),0);
+ const totalPendingRequested=rows.filter(x=>withdrawStatusType(x.status)==="pending").reduce((sum,r)=>sum+Number(r.amount||0),0);
+ document.getElementById("adminWithdrawSummary").innerHTML=
+  '<div><span class="admin-small">Menunggu</span><b class="status-pending">'+pending+'</b></div>'+
+  '<div><span class="admin-small">Berhasil</span><b class="status-success">'+success+'</b></div>'+
+  '<div><span class="admin-small">Ditolak</span><b class="status-rejected">'+rejected+'</b></div>'+
+  '<div><span class="admin-small">Saldo semua user</span><b class="status-success">'+rupiah(totalCurrentBalance)+'</b></div>'+
+  '<div><span class="admin-small">Total dibayar</span><b class="status-success">'+rupiah(totalSuccessfulPaid)+'</b></div>'+
+  '<div><span class="admin-small">Masih menunggu</span><b class="status-pending">'+rupiah(totalPendingRequested)+'</b></div>';
  document.querySelectorAll("#adminWithdrawFilters .history-filter").forEach(btn=>{
     const txt=btn.textContent.toLowerCase();
     const key=txt.includes("menunggu")?"pending":txt.includes("berhasil")?"success":txt.includes("ditolak")?"rejected":"all";
@@ -967,12 +983,16 @@ async function loadAdminWithdrawals(){
    if(!groups.has(key))groups.set(key,[]);
    groups.get(key).push(r);
  });
- const sortedGroups=[...groups.entries()].sort((a,b)=>String(pmap[a[0]]||a[0]).localeCompare(String(pmap[b[0]]||b[0])));
+ const sortedGroups=[...groups.entries()].sort((a,b)=>String(pmap[a[0]]?.email||a[0]).localeCompare(String(pmap[b[0]]?.email||b[0])));
  wrap.innerHTML=sortedGroups.map(([userId,list],idx)=>{
-   const email=pmap[userId]||userId||"Tidak diketahui";
+   const profile=pmap[userId]||{};
+   const email=profile.email||userId||"Tidak diketahui";
+   const currentBalance=Number(profile.saldo||0);
    const p=list.filter(r=>withdrawStatusType(r.status)==="pending").length;
    const ok=list.filter(r=>withdrawStatusType(r.status)==="success").length;
    const rej=list.filter(r=>withdrawStatusType(r.status)==="rejected").length;
+   const pendingAmount=list.filter(r=>withdrawStatusType(r.status)==="pending").reduce((sum,r)=>sum+Number(r.amount||0),0);
+   const successfulAmount=list.filter(r=>withdrawStatusType(r.status)==="success").reduce((sum,r)=>sum+Number(r.amount||0),0);
    const items=list.map(r=>{
      const type=withdrawStatusType(r.status);
      const label=withdrawStatusLabel(r.status);
@@ -982,9 +1002,12 @@ async function loadAdminWithdrawals(){
        '<div class="admin-withdraw-actions"><label class="admin-withdraw-label">Status</label><select id="wstatus_'+Number(r.id)+'"><option value="pending" '+(type==="pending"?"selected":"")+'>Menunggu</option><option value="success" '+(type==="success"?"selected":"")+'>Transfer berhasil</option><option value="rejected" '+(type==="rejected"?"selected":"")+'>Ditolak</option></select><label class="admin-withdraw-label">Catatan</label><textarea id="wnote_'+Number(r.id)+'" placeholder="Catatan...">'+safe(r.admin_note||"")+'</textarea><button class="admin-save" onclick="simpanWithdrawAdmin('+Number(r.id)+')">Simpan perubahan</button></div>'+ 
      '</div>';
    }).join("");
-   return '<div class="admin-withdraw-group"><div class="admin-withdraw-head"><div class="admin-withdraw-title">📁 Folder '+(idx+1)+' — Akun penyetor:<br>'+safe(email)+'</div><div class="admin-withdraw-count">'+list.length+' penarikan</div></div><div class="admin-withdraw-body"><div class="admin-withdraw-summary"><div><span>Menunggu</span><b class="status-pending">'+p+'</b></div><div><span>Berhasil</span><b class="status-success">'+ok+'</b></div><div><span>Ditolak</span><b class="status-rejected">'+rej+'</b></div></div>'+items+'</div></div>';
+   return '<div class="admin-withdraw-group"><div class="admin-withdraw-head"><div class="admin-withdraw-title">📁 Folder '+(idx+1)+' — Akun penyetor:<br>'+safe(email)+'</div><div class="admin-withdraw-count">'+list.length+' penarikan</div></div><div class="admin-withdraw-body">'+
+     '<div class="admin-withdraw-balance"><div><span>Saldo user saat ini</span><b>'+rupiah(currentBalance)+'</b></div><div><span>Total penarikan berhasil</span><b>'+rupiah(successfulAmount)+'</b></div></div>'+
+     '<div class="admin-withdraw-total"><b>Ringkasan akun</b><br>Menunggu: '+rupiah(pendingAmount)+' • Berhasil: '+rupiah(successfulAmount)+'<br>Saldo di atas adalah saldo terbaru di database. Saat pengajuan dibuat, sistem sudah mengurangi saldo yang ditarik; jika pengajuan ditolak, saldo dikembalikan oleh sistem.</div>'+
+     '<div class="admin-withdraw-summary"><div><span>Menunggu</span><b class="status-pending">'+p+'</b></div><div><span>Berhasil</span><b class="status-success">'+ok+'</b></div><div><span>Ditolak</span><b class="status-rejected">'+rej+'</b></div></div>'+items+'</div></div>';
  }).join("");
- setMessage("adminMessage","#5ce2ae","Data penarikan berhasil dimuat.");
+ setMessage("adminMessage","#5ce2ae","Data penarikan dan saldo user berhasil dimuat.");
 }
 async function simpanWithdrawAdmin(id){
   if(!isAdmin){setMessage("adminMessage","#ff6b6b","Akses Admin ditolak.");return}
