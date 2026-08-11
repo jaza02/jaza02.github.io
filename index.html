@@ -34,6 +34,7 @@ button{font:inherit;border:0;cursor:pointer}
 .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.modal-header h2{margin:0;font-size:21px}.close{width:38px;height:38px;border-radius:10px;background:#182c43;color:#fff;font-size:25px}
 .modal label{display:block;margin:14px 0 7px;color:var(--muted);font-size:13px}.modal input,.modal select{width:100%;padding:13px;border-radius:11px;border:1px solid #29425d;background:#102238;color:#fff;outline:none}.modal-submit{width:100%;padding:13px;margin-top:18px;border-radius:12px;background:var(--red);color:#fff;font-weight:800}.google-btn{width:100%;padding:13px;margin-top:10px;border-radius:12px;background:#fff;color:#202124;font-weight:800;border:1px solid #dadce0}.google-note{font-size:11px;color:var(--muted);line-height:1.45;margin-top:9px;text-align:center}.message{text-align:center;font-size:13px;margin-top:12px;line-height:1.4}
 .gmail-list{display:flex;flex-direction:column;gap:9px;margin-top:10px}.gmail-row{display:flex;gap:8px;align-items:center}.gmail-no{width:34px;text-align:center;color:var(--muted);font-weight:800}.gmail-row input{flex:1}.remove-gmail{width:42px;height:42px;border-radius:10px;background:#351d25;color:#ff8d98}
+.gmail-bulk-input{width:100%;min-height:260px;resize:vertical;padding:15px;border-radius:14px;border:1px solid #29425d;background:#102238;color:#fff;outline:none;font:inherit;line-height:1.65;white-space:pre-wrap}.gmail-bulk-input:focus{border-color:#5b8cff;box-shadow:0 0 0 2px rgba(91,140,255,.12)}.bulk-gmail-note{margin:4px 0 9px;color:var(--muted);font-size:12px;line-height:1.5}.bulk-gmail-note b{color:#9fc0ff}
 .add-btn{width:100%;padding:12px;border-radius:12px;background:#17304b;border:1px dashed #416487;color:#9fc0ff;font-weight:800;margin-top:10px}
 .total-box{margin-top:15px;padding:14px;border-radius:14px;background:#102c35;border:1px solid #24584e;display:flex;justify-content:space-between;align-items:center}.total-box span{color:var(--muted);font-size:13px}.total-box strong{font-size:23px;color:#58e1ad}
 .whatsapp-box{margin-top:15px;padding-top:14px;border-top:1px solid var(--line)}
@@ -60,6 +61,31 @@ button{font:inherit;border:0;cursor:pointer}
 .admin-user-group-table th{color:#8fa0b5;font-weight:800;background:#102238}
 .admin-user-group-table tr:last-child td{border-bottom:0}
 .admin-user-group-table td:first-child{word-break:break-all}
+.admin-withdraw-group{margin-top:12px;border:1px solid var(--line);border-radius:16px;background:#102238;overflow:hidden}
+.admin-withdraw-head{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:14px 15px;background:#162d48;border-bottom:1px solid rgba(255,255,255,.06)}
+.admin-withdraw-title{font-weight:900;color:#fff;line-height:1.35;word-break:break-word}
+.admin-withdraw-count{font-size:12px;font-weight:900;color:#9fc0ff;white-space:nowrap}
+.admin-withdraw-body{padding:13px 15px}
+.admin-withdraw-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:0 0 12px}
+.admin-withdraw-summary>div{padding:8px 9px;border:1px solid rgba(255,255,255,.07);border-radius:10px;background:#0d1a2b}
+.admin-withdraw-summary span{display:block;font-size:10px;color:#8fa0b5;margin-bottom:3px}
+.admin-withdraw-summary b{font-size:14px}
+.admin-withdraw-balance{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:0 0 12px}
+.admin-withdraw-balance>div{padding:10px;border:1px solid rgba(92,226,174,.18);border-radius:11px;background:#0b1929}
+.admin-withdraw-balance span{display:block;font-size:10px;color:#8fa0b5;margin-bottom:4px}
+.admin-withdraw-balance b{font-size:15px;color:#5ce2ae;word-break:break-word}
+.admin-withdraw-total{margin:0 0 12px;padding:10px 11px;border-radius:11px;background:#0d1a2b;border:1px solid rgba(159,192,255,.14);font-size:11px;color:#b9c7d8;line-height:1.5}
+.admin-withdraw-total b{color:#fff}
+.admin-withdraw-item{padding:12px;border:1px solid rgba(255,255,255,.08);border-radius:13px;background:#0d1a2b;margin-top:10px}
+.admin-withdraw-item:first-child{margin-top:0}
+.admin-withdraw-line{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.admin-withdraw-label{font-size:11px;color:#8fa0b5;margin-bottom:3px}
+.admin-withdraw-value{font-size:13px;font-weight:800;color:#fff;word-break:break-word}
+.admin-withdraw-amount{font-size:16px;color:#5ce2ae;font-weight:900;white-space:nowrap}
+.admin-withdraw-meta{font-size:11px;color:#9aaec3;line-height:1.5;margin-top:8px}
+.admin-withdraw-actions{margin-top:10px;display:grid;gap:8px}
+.admin-withdraw-actions select,.admin-withdraw-actions textarea{width:100%;box-sizing:border-box}
+@media(max-width:520px){.admin-withdraw-summary{grid-template-columns:1fr 1fr}.admin-withdraw-summary>div:last-child{grid-column:1/-1}}
 
 .history-item{padding:12px;border:1px solid var(--line);border-radius:13px;background:#102238}
 .history-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
@@ -73,15 +99,42 @@ button{font:inherit;border:0;cursor:pointer}
 .withdraw-status-rejected{color:#ff6b6b}
 
 @media(max-width:520px){.history-summary{gap:6px}.history-summary div{padding:9px}.history-filter{min-width:90px}}
+.folder-summary{padding:12px 13px;background:#0e1d2e}
+.folder-summary>div{display:flex;gap:8px;align-items:flex-start;margin-bottom:8px;line-height:1.45}
+.folder-summary>div:last-child{margin-bottom:0}
+.folder-summary>div>span:first-child{color:#8fa0b5;font-weight:800;min-width:120px}
+.folder-summary>div>b{color:#fff;word-break:break-word}
+.folder-label{margin-top:4px;color:#9fc0ff;font-size:11px;font-weight:700}
+.folder-status-summary{display:flex;gap:8px;flex-wrap:wrap}
+.folder-gmail-heading{display:flex!important;justify-content:space-between;align-items:center!important}
+.folder-gmail-list{list-style:none;margin:2px 0 0;padding:0 0 0 128px}
+.folder-gmail-item{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.folder-gmail-item:last-child{border-bottom:0}
+.folder-gmail-address{font-weight:800;color:#fff;word-break:break-all}
+.folder-gmail-meta{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:5px;font-size:10px;color:#8fa0b5}
+.folder-gmail-actions{display:flex;gap:5px;flex-wrap:wrap}
+.folder-gmail-note{margin-top:5px;color:#b9c7d8;font-size:10px}
+.whatsapp-send{white-space:nowrap}
+@media(max-width:520px){
+ .folder-summary>div{display:block}
+ .folder-summary>div>span:first-child{display:block;min-width:0;margin-bottom:2px}
+ .folder-gmail-list{padding-left:0}
+ .folder-gmail-heading{display:flex!important}
+}
 
-.platform-stats{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0}
-.platform-stat{position:relative;overflow:hidden;display:flex;align-items:center;gap:14px;padding:18px 19px;border-radius:20px;border:1px solid #29425d;background:linear-gradient(135deg,#122b45 0%,#0d1a2b 100%);box-shadow:0 12px 30px rgba(0,0,0,.16)}
-.platform-stat:after{content:"";position:absolute;width:110px;height:110px;border-radius:50%;right:-42px;top:-42px;background:rgba(120,161,255,.08)}
-.platform-stat-icon{width:46px;height:46px;display:grid;place-items:center;border-radius:14px;background:#17304b;border:1px solid #31577f;font-size:21px;flex:none}
-.platform-stat-label{font-size:10px;letter-spacing:1.3px;font-weight:900;color:#8fa0b5}
-.platform-stat-number{margin-top:4px;font-size:27px;line-height:1.1;font-weight:950;color:#fff;word-break:break-word}
-.platform-stat-note{margin-top:5px;font-size:11px;color:#70839a}
-@media(max-width:520px){.platform-stats{grid-template-columns:1fr;gap:10px}.platform-stat{padding:16px}.platform-stat-number{font-size:25px}}
+
+.public-platform-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:16px 0}
+.public-stat-card{position:relative;overflow:hidden;display:flex;align-items:center;gap:13px;padding:17px;border:1px solid #29425d;border-radius:18px;background:linear-gradient(135deg,#132c47,#0d1b2c);box-shadow:0 10px 26px rgba(0,0,0,.15)}
+.public-stat-card:after{content:"";position:absolute;width:90px;height:90px;border-radius:50%;right:-35px;top:-35px;background:rgba(120,161,255,.07)}
+.public-stat-icon{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;background:#17324f;border:1px solid #31577f;font-size:20px;flex:none}
+.public-stat-label{font-size:10px;letter-spacing:1.2px;font-weight:900;color:#8fa0b5}
+.public-stat-number{font-size:25px;font-weight:950;line-height:1.15;margin-top:4px;color:#fff;word-break:break-word}
+.public-stat-note{font-size:10px;color:#70839a;margin-top:4px}
+.admin-user-group-head{cursor:pointer}
+.folder-caret{font-size:13px;color:#9fc0ff;margin-left:7px}
+.folder-content{display:none}
+.admin-user-group.open .folder-content{display:block}
+@media(max-width:520px){.public-platform-stats{grid-template-columns:1fr}.public-stat-number{font-size:23px}}
 
 </style>
 </head>
@@ -110,6 +163,11 @@ button{font:inherit;border:0;cursor:pointer}
  <section class="card notice">
   <div class="notice-icon">⏱</div>
   <div><b>Informasi penarikan saldo</b><p>Penarikan saldo tersedia setiap Selasa–Sabtu, pukul 16:00–20:00. Minggu dan Senin tidak tersedia. Pastikan data tujuan sudah benar sebelum mengajukan penarikan.</p></div>
+ </section>
+
+ <section class="public-platform-stats">
+  <div class="public-stat-card"><div class="public-stat-icon">👥</div><div><div class="public-stat-label">TOTAL USER AKTIF</div><div class="public-stat-number" id="publicTotalUsers">0</div><div class="public-stat-note">Pengguna terdaftar</div></div></div>
+  <div class="public-stat-card"><div class="public-stat-icon">💰</div><div><div class="public-stat-label">TOTAL PENARIKAN</div><div class="public-stat-number" id="publicTotalWithdrawals">Rp 0</div><div class="public-stat-note">Total pembayaran berhasil</div></div></div>
  </section>
 
  <div class="grid">
@@ -159,6 +217,10 @@ button{font:inherit;border:0;cursor:pointer}
   </aside>
  </div>
 
+ <section class="card" style="margin-top:16px">
+  <button class="btn secondary" style="width:100%" onclick="bukaRiwayatGmail()">Lihat Riwayat Gmail</button>
+  <button class="btn secondary" style="width:100%;margin-top:8px" onclick="bukaRiwayatPenarikan()">Lihat Riwayat Penarikan</button>
+ </section>
 </section>
 </main>
 
@@ -221,10 +283,13 @@ button{font:inherit;border:0;cursor:pointer}
 <div id="gmailModal" class="modal">
  <div class="modal-box">
   <div class="modal-header"><h2>Stor Gmail</h2><button class="close" onclick="tutupModal('gmailModal')">×</button></div>
-  <div class="info-box"><span>Total Gmail dalam setoran ini</span><strong id="setoranTotal">1 Gmail</strong></div>
-  <label>Daftar Gmail</label>
-  <div id="gmailList" class="gmail-list"></div>
-  <button class="add-btn" onclick="tambahGmail()">＋ Tambah Gmail</button>
+  <div class="info-box"><span>Total Gmail dalam setoran ini</span><strong id="setoranTotal">0 Gmail</strong></div>
+  <label for="gmailBulkInput">Masukkan semua Gmail di sini</label>
+  <div class="bulk-gmail-note">Satu Gmail per baris. Anda bisa langsung <b>copy-paste</b> banyak Gmail sekaligus.</div>
+  <textarea id="gmailBulkInput" class="gmail-bulk-input" rows="12" placeholder="Gsiers@gmail.com
+Jsgei@gmail.com
+Jstuei@gmail.com
+dan seterusnya..."></textarea>
 
   <div class="whatsapp-box">
    <label>Kontak WhatsApp penyetor</label>
@@ -294,7 +359,8 @@ button{font:inherit;border:0;cursor:pointer}
     <button class="history-filter" onclick="setAdminWithdrawFilter('success')">Berhasil</button>
     <button class="history-filter" onclick="setAdminWithdrawFilter('rejected')">Ditolak</button>
    </div>
-   <div class="admin-scroll"><table class="admin-table"><thead><tr><th>Akun</th><th>Jumlah</th><th>Metode</th><th>Tujuan</th><th>Tanggal</th><th>Status</th><th>Catatan</th><th>Aksi</th></tr></thead><tbody id="adminWithdrawBody"></tbody></table></div>
+   <div id="adminWithdrawGroups"></div>
+   <div id="adminWithdrawBody" style="display:none"></div>
   </div>
  </div>
 </div>
@@ -332,6 +398,7 @@ let isAdmin=false;
 let adminTab="gmail";
 let adminGmailFilter="all";
 let adminWithdrawFilter="all";
+let adminGmailCache=[];
 let userGmailFilter="all";
 let userWithdrawFilter="all";
 let withdrawHistory=[];
@@ -361,20 +428,17 @@ async function checkAdmin(){
  return isAdmin;
 }
 
-
 async function loadPublicPlatformStats(){
-  const usersEl=document.getElementById("publicTotalUsers");
-  const withdrawalsEl=document.getElementById("publicTotalWithdrawals");
-  if(!usersEl||!withdrawalsEl)return;
-  try{
-    const {data,error}=await supabaseClient.rpc("get_public_platform_stats");
-    if(error)throw error;
-    const row=Array.isArray(data)?data[0]:data;
-    usersEl.textContent=Number(row?.total_users||0).toLocaleString("id-ID");
-    withdrawalsEl.textContent=rupiah(Number(row?.total_withdrawals||0));
-  }catch(error){
-    console.error("loadPublicPlatformStats:",error);
-  }
+ const usersEl=document.getElementById('publicTotalUsers');
+ const withdrawalsEl=document.getElementById('publicTotalWithdrawals');
+ if(!usersEl||!withdrawalsEl)return;
+ try{
+  const {data,error}=await supabaseClient.rpc('get_public_platform_stats');
+  if(error)throw error;
+  const row=Array.isArray(data)?data[0]:data;
+  usersEl.textContent=Number(row?.total_users||0).toLocaleString('id-ID');
+  withdrawalsEl.textContent=rupiah(Number(row?.total_withdrawals||0));
+ }catch(e){console.error('loadPublicPlatformStats:',e)}
 }
 
 async function loadUser(){
@@ -514,8 +578,10 @@ async function ajukanPenarikan(){
     if(rpc.error)throw rpc.error;
     msg.style.color="#5ce2ae";msg.textContent="Penarikan berhasil diajukan dan saldo telah dikurangi.";
     await loadUser();
-    document.getElementById("withdrawActivityTitle").textContent="Penarikan menunggu proses";
-    document.getElementById("withdrawActivityText").textContent=metode+" • "+rupiah(jumlah);
+    const withdrawActivityTitle=document.getElementById("withdrawActivityTitle");
+    const withdrawActivityText=document.getElementById("withdrawActivityText");
+    if(withdrawActivityTitle)withdrawActivityTitle.textContent="Penarikan menunggu proses";
+    if(withdrawActivityText)withdrawActivityText.textContent=metode+" • "+rupiah(jumlah);
   }catch(error){
     console.error("ajukanPenarikan:",error);
     msg.style.color="#ff6b6b";
@@ -524,45 +590,56 @@ async function ajukanPenarikan(){
 }
 
 function bukaDetail(){if(!currentUser){bukaLogin();return}updateTampilan();bukaModal("detailModal")}
-function buatBarisGmail(index,value=""){
- const row=document.createElement("div");row.className="gmail-row";
- row.innerHTML='<div class="gmail-no">'+index+'</div><input type="email" class="gmail-input" placeholder="alamat@gmail.com"><button class="remove-gmail" type="button" title="Hapus">×</button>';
- row.querySelector(".gmail-input").value=value;
- row.querySelector(".remove-gmail").onclick=function(){row.remove();renumberGmail()};
- row.querySelector(".gmail-input").addEventListener("input",updateSetoranTotal);
- document.getElementById("gmailList").appendChild(row);
+function parseBulkGmail(){
+ const raw=document.getElementById("gmailBulkInput")?.value||"";
+ return raw.split(/\r?\n/).map(v=>v.trim()).filter(Boolean);
 }
-function renumberGmail(){document.querySelectorAll("#gmailList .gmail-row").forEach((row,i)=>row.querySelector(".gmail-no").textContent=i+1);updateSetoranTotal()}
-function updateSetoranTotal(){document.getElementById("setoranTotal").textContent=document.querySelectorAll("#gmailList .gmail-row").length+" Gmail"}
-function tambahGmail(){buatBarisGmail(document.querySelectorAll("#gmailList .gmail-row").length+1);updateSetoranTotal()}
+function updateSetoranTotal(){
+ const count=parseBulkGmail().length;
+ document.getElementById("setoranTotal").textContent=count+" Gmail";
+}
+function tambahGmail(){
+ const input=document.getElementById("gmailBulkInput");
+ if(!input)return;
+ const lines=parseBulkGmail();
+ input.value+=(lines.length?"\n":"")+"alamat@gmail.com";
+ updateSetoranTotal();
+ input.focus();
+}
 function bukaGmail(){
  if(!currentUser){bukaLogin();return}
  document.getElementById("gmailMessage").textContent="";
- document.getElementById("gmailList").innerHTML="";
- buatBarisGmail(1);
+ document.getElementById("gmailBulkInput").value="";
  document.getElementById("submitterWhatsApp").value=submitterWhatsApp||"";
- updateSetoranTotal();bukaModal("gmailModal");setNav("navGmail");
+ updateSetoranTotal();
+ bukaModal("gmailModal");setNav("navGmail");
+ setTimeout(()=>document.getElementById("gmailBulkInput")?.focus(),100);
 }
+
+document.addEventListener("input",function(e){
+ if(e.target&&e.target.id==="gmailBulkInput")updateSetoranTotal();
+});
 
 async function kirimSemuaGmail(){
  if(!currentUser){bukaLogin();return}
- const inputs=[...document.querySelectorAll(".gmail-input")];
- const emails=inputs.map(i=>i.value.trim().toLowerCase()).filter(Boolean);
+ const emails=parseBulkGmail().map(v=>v.toLowerCase());
  const wa=document.getElementById("submitterWhatsApp").value.trim();
  const msg=document.getElementById("gmailMessage");
- if(emails.length===0){msg.style.color="#ff6b6b";msg.textContent="Masukkan minimal 1 Gmail.";return}
- for(const email of emails){if(!/^[^\s@]+@gmail\.com$/i.test(email)){msg.style.color="#ff6b6b";msg.textContent="Ada alamat yang bukan Gmail atau formatnya salah.";return}}
+ if(emails.length===0){msg.style.color="#ff6b6b";msg.textContent="Masukkan minimal 1 Gmail, satu Gmail per baris.";return}
+ for(const email of emails){if(!/^[^\s@]+@gmail\.com$/i.test(email)){msg.style.color="#ff6b6b";msg.textContent="Ada alamat yang bukan Gmail atau formatnya salah: "+email;return}}
  if(!wa){msg.style.color="#ff6b6b";msg.textContent="Masukkan kontak WhatsApp penyetor.";return}
  const unique=[...new Set(emails)];if(unique.length!==emails.length){msg.style.color="#ff6b6b";msg.textContent="Ada Gmail yang sama dalam setoran ini.";return}
- msg.style.color="#8fa0b5";msg.textContent="Menyimpan Gmail...";
+ msg.style.color="#8fa0b5";msg.textContent="Menyimpan "+emails.length+" Gmail...";
  const rows=emails.map(email=>({user_id:currentUser.id,gmail:email,submitter_whatsapp:wa,status:"pending",amount:0}));
  const {error}=await supabaseClient.from("gmail_submissions").insert(rows);
  if(error){msg.style.color="#ff6b6b";msg.textContent=error.message;return}
  await supabaseClient.from("profiles").update({whatsapp:wa}).eq("id",currentUser.id);
  submitterWhatsApp=wa;
  await loadUser();
- document.getElementById("gmailActivityTitle").textContent=emails.length+" Gmail berhasil dikirim";
- document.getElementById("gmailActivityText").textContent="Status: menunggu pemeriksaan admin • Kontak: "+wa;
+ const gmailActivityTitle=document.getElementById("gmailActivityTitle");
+ const gmailActivityText=document.getElementById("gmailActivityText");
+ if(gmailActivityTitle)gmailActivityTitle.textContent=emails.length+" Gmail berhasil dikirim";
+ if(gmailActivityText)gmailActivityText.textContent="Status: menunggu pemeriksaan admin • Kontak: "+wa;
  msg.style.color="#5ce2ae";msg.textContent="Berhasil mencatat "+emails.length+" Gmail. Menunggu pemeriksaan admin.";
 }
 
@@ -721,6 +798,7 @@ async function loadAdminGmail(){
    .select("id,user_id,gmail,submitter_whatsapp,created_at,status,amount,reviewed_at,admin_note")
    .order("created_at",{ascending:false});
  if(error){setMessage("adminMessage","#ff6b6b",error.message);return}
+ adminGmailCache=rows||[];
 
  const filterButtons=document.querySelectorAll("#adminGmailFilters .history-filter");
  filterButtons.forEach(btn=>{
@@ -762,6 +840,14 @@ async function loadAdminGmail(){
    groups.get(key).push(r);
  });
 
+ const profileIds=[...groups.keys()].filter(id=>id&&id!=="unknown");
+ const profileMap=new Map();
+ if(profileIds.length){
+   const {data:profiles}=await supabaseClient.from("profiles").select("id,email,whatsapp").in("id",profileIds);
+   (profiles||[]).forEach(p=>profileMap.set(p.id,p));
+ }
+ adminGmailCache=(adminGmailCache||[]).map(r=>({...r,user_email:profileMap.get(r.user_id)?.email||""}));
+
  const sortedGroups=[...groups.entries()].sort((x,y)=>{
    const ax=String(x[1][0]?.submitter_whatsapp||x[0]);
    const by=String(y[1][0]?.submitter_whatsapp||y[0]);
@@ -769,33 +855,79 @@ async function loadAdminGmail(){
  });
 
  wrap.innerHTML=sortedGroups.map(([userId,list],idx)=>{
-   const label=list[0]?.submitter_whatsapp ? "Penyetor: "+safe(list[0].submitter_whatsapp) : "User ID: "+safe(userId);
-   const rowsHtml=list.map(r=>{
+   const profile=profileMap.get(userId)||{};
+   const accountEmail=profile.email||"—";
+   const whatsapp=profile.whatsapp||list[0]?.submitter_whatsapp||"—";
+   const acceptedCount=list.filter(r=>["accepted","diterima"].includes(String(r.status||"").toLowerCase())).length;
+   const rejectedCount=list.filter(r=>["rejected","ditolak"].includes(String(r.status||"").toLowerCase())).length;
+   const pendingCount=list.length-acceptedCount-rejectedCount;
+   const statusSummary=(acceptedCount?'<span class="status-accepted">'+acceptedCount+' Diterima</span> ':'')+
+     (pendingCount?'<span class="status-pending">'+pendingCount+' Menunggu</span> ':'')+
+     (rejectedCount?'<span class="status-rejected">'+rejectedCount+' Ditolak</span>':'');
+   const gmailItems=list.map((r,i)=>{
      const s=String(r.status||"").toLowerCase();
      const type=(s==="accepted"||s==="diterima")?"accepted":(s==="rejected"||s==="ditolak")?"rejected":"pending";
-     const statusLabel=type==="accepted"?"Diterima":type==="rejected"?"Ditolak":"Menunggu review";
+     const statusLabel=type==="accepted"?"Diterima":type==="rejected"?"Ditolak":"Menunggu";
      const statusClass=type==="accepted"?"status-accepted":type==="rejected"?"status-rejected":"status-pending";
-     const action=(type==="pending")?
-       '<div style="display:flex;gap:5px;flex-wrap:wrap">'+
+     const action=type==="pending"?
+       '<span class="folder-gmail-actions">'+
        '<button class="btn small" onclick="terimaGmailAdmin('+Number(r.id)+')">Terima</button>'+
        '<button class="btn small danger" onclick="tolakGmailAdmin('+Number(r.id)+')">Tolak</button>'+
-       '</div>':
-       '<span class="admin-small">Sudah diproses</span>';
-     return '<tr>'+
-       '<td><b>'+safe(r.gmail)+'</b></td>'+
-       '<td>'+safe(r.submitter_whatsapp||"—")+'</td>'+
-       '<td>'+safe(fmtDate(r.created_at))+'</td>'+
-       '<td><span class="'+statusClass+'">'+statusLabel+'</span></td>'+
-       '<td>'+rupiah(Number(r.amount||0))+'</td>'+
-       '<td>'+safe(r.admin_note||"—")+'</td>'+
-       '<td>'+action+'</td>'+
-       '</tr>';
+       '</span>':
+       '<span class="admin-small">'+statusLabel+'</span>';
+     return '<li class="folder-gmail-item">'+
+       '<div class="folder-gmail-address">'+safe(r.gmail)+'</div>'+
+       '<div class="folder-gmail-meta"><span>'+safe(fmtDate(r.created_at))+'</span>'+action+'</div>'+
+       (r.admin_note?'<div class="folder-gmail-note">Catatan: '+safe(r.admin_note)+'</div>':'')+
+       '</li>';
    }).join("");
    return '<div class="admin-user-group">'+
-     '<div class="admin-user-group-head"><div class="admin-user-group-title">'+label+'</div><div class="admin-user-group-count">'+list.length+' Gmail</div></div>'+
-     '<div class="admin-scroll"><table class="admin-user-group-table"><thead><tr><th>Gmail</th><th>WhatsApp</th><th>Tanggal</th><th>Status</th><th>Nominal</th><th>Catatan</th><th>Aksi</th></tr></thead><tbody>'+rowsHtml+'</tbody></table></div>'+
+     '<div class="admin-user-group-head" onclick="toggleGmailFolder(this)"><div><div class="admin-user-group-title">📁 Folder '+(idx+1)+' <span class="folder-caret">▼</span></div><div class="folder-label">Akun penyetor: <b>'+safe(accountEmail)+'</b></div></div><div class="admin-user-group-count">'+list.length+' Gmail</div></div>'+
+     '<div class="folder-content"><div class="folder-summary">'+
+       '<div><span>Akun penyetor :</span><b>'+safe(userId)+'</b></div>'+
+       '<div><span>Nomor WhatsApp:</span><b>'+safe(whatsapp)+'</b></div>'+
+       '<div><span>Status :</span><b class="folder-status-summary">'+(statusSummary||'—')+'</b></div>'+
+       '<div class="folder-gmail-heading"><span>Gmail :</span><button class="btn small whatsapp-send" onclick="kirimFolderWhatsApp('+JSON.stringify(userId)+')">📲 Kirim semua</button></div>'+
+       '<ul class="folder-gmail-list">'+gmailItems+'</ul>'+
+     '</div></div>'+
      '</div>';
  }).join("");
+}
+
+function toggleGmailFolder(head){
+ const group=head.closest('.admin-user-group');
+ if(!group)return;
+ group.classList.toggle('open');
+ const caret=head.querySelector('.folder-caret');
+ if(caret)caret.textContent=group.classList.contains('open')?'▲':'▼';
+}
+
+function normalizeWhatsAppNumber(v){
+ const raw=String(v||"").replace(/[^0-9+]/g,"");
+ if(!raw)return"";
+ if(raw.startsWith("+"))return raw.slice(1);
+ if(raw.startsWith("0"))return "62"+raw.slice(1);
+ if(raw.startsWith("62"))return raw;
+ return raw;
+}
+
+function kirimFolderWhatsApp(userId){
+ if(!isAdmin){setMessage("adminMessage","#ff6b6b","Akses Admin ditolak.");return}
+ const rows=adminGmailCache.filter(r=>(r.user_id||"unknown")===userId);
+ if(!rows.length){setMessage("adminMessage","#ff6b6b","Data Gmail folder tidak ditemukan.");return}
+ const profileRows=rows[0];
+ const accountEmail=profileRows?.user_email||"";
+ const whatsapp=profileRows?.submitter_whatsapp||"";
+ const target=prompt("Masukkan nomor WhatsApp tujuan admin (contoh 081234567890):","");
+ if(target===null)return;
+ const phone=normalizeWhatsAppNumber(target);
+ if(!phone){setMessage("adminMessage","#ff6b6b","Nomor WhatsApp tujuan belum diisi.");return}
+ const accepted=rows.filter(r=>["accepted","diterima"].includes(String(r.status||"").toLowerCase())).length;
+ const rejected=rows.filter(r=>["rejected","ditolak"].includes(String(r.status||"").toLowerCase())).length;
+ const pending=rows.length-accepted-rejected;
+ const lines=rows.map((r,i)=>((i+1)+". "+r.gmail)).join("\n");
+ const msg="📁 REKAP SETORAN GMAIL\n\nAkun penyetor: "+(accountEmail||"—")+"\nNomor WhatsApp: "+(whatsapp||"—")+"\nStatus: "+accepted+" Diterima, "+pending+" Menunggu, "+rejected+" Ditolak\n\nGmail:\n"+lines;
+ window.open("https://wa.me/"+phone+"?text="+encodeURIComponent(msg),"_blank");
 }
 
 async function terimaGmailAdmin(id){
@@ -867,27 +999,71 @@ async function loadAdminWithdrawals(){
  setMessage("adminMessage","#8fa0b5","Memuat penarikan...");
  const {data,error}=await supabaseClient.from("withdrawals").select("id,user_id,amount,method,destination,status,created_at,admin_note,processed_at").order("created_at",{ascending:false});
  if(error){setMessage("adminMessage","#ff6b6b",error.message);return}
- const ids=[...new Set((data||[]).map(x=>x.user_id).filter(Boolean))];let profiles=[];
- if(ids.length){const r=await supabaseClient.from("profiles").select("id,email").in("id",ids);if(!r.error)profiles=r.data||[]}
- const pmap=Object.fromEntries(profiles.map(p=>[p.id,p.email]));const rows=data||[];
- const pending=rows.filter(x=>withdrawStatusType(x.status)==="pending").length,success=rows.filter(x=>withdrawStatusType(x.status)==="success").length,rejected=rows.filter(x=>withdrawStatusType(x.status)==="rejected").length;
- document.getElementById("adminWithdrawSummary").innerHTML='<div><span class="admin-small">Menunggu</span><b class="status-pending">'+pending+'</b></div><div><span class="admin-small">Berhasil</span><b class="status-success">'+success+'</b></div><div><span class="admin-small">Ditolak</span><b class="status-rejected">'+rejected+'</b></div>';
+ const rows=data||[];
+ const ids=[...new Set(rows.map(x=>x.user_id).filter(Boolean))];
+ let profiles=[];
+ const allProfiles=await supabaseClient.from("profiles").select("id,email,saldo");
+ if(!allProfiles.error){
+   profiles=allProfiles.data||[];
+ }else if(ids.length){
+   const r=await supabaseClient.from("profiles").select("id,email,saldo").in("id",ids);
+   if(!r.error)profiles=r.data||[];
+ }
+ const pmap=Object.fromEntries(profiles.map(p=>[p.id,p]));
+ const pending=rows.filter(x=>withdrawStatusType(x.status)==="pending").length;
+ const success=rows.filter(x=>withdrawStatusType(x.status)==="success").length;
+ const rejected=rows.filter(x=>withdrawStatusType(x.status)==="rejected").length;
+ const totalCurrentBalance=profiles.reduce((sum,p)=>sum+Number(p.saldo||0),0);
+ const totalSuccessfulPaid=rows.filter(x=>withdrawStatusType(x.status)==="success").reduce((sum,r)=>sum+Number(r.amount||0),0);
+ const totalPendingRequested=rows.filter(x=>withdrawStatusType(x.status)==="pending").reduce((sum,r)=>sum+Number(r.amount||0),0);
+ document.getElementById("adminWithdrawSummary").innerHTML=
+  '<div><span class="admin-small">Menunggu</span><b class="status-pending">'+pending+'</b></div>'+
+  '<div><span class="admin-small">Berhasil</span><b class="status-success">'+success+'</b></div>'+
+  '<div><span class="admin-small">Ditolak</span><b class="status-rejected">'+rejected+'</b></div>'+
+  '<div><span class="admin-small">Saldo semua user</span><b class="status-success">'+rupiah(totalCurrentBalance)+'</b></div>'+
+  '<div><span class="admin-small">Total dibayar</span><b class="status-success">'+rupiah(totalSuccessfulPaid)+'</b></div>'+
+  '<div><span class="admin-small">Masih menunggu</span><b class="status-pending">'+rupiah(totalPendingRequested)+'</b></div>';
  document.querySelectorAll("#adminWithdrawFilters .history-filter").forEach(btn=>{
     const txt=btn.textContent.toLowerCase();
     const key=txt.includes("menunggu")?"pending":txt.includes("berhasil")?"success":txt.includes("ditolak")?"rejected":"all";
     btn.classList.toggle("active",key===adminWithdrawFilter);
   });
-  const filteredRows=adminWithdrawFilter==="all"?rows:rows.filter(x=>withdrawStatusType(x.status)===adminWithdrawFilter);
-  const body=document.getElementById("adminWithdrawBody");
- if(!filteredRows.length){body.innerHTML='<tr><td colspan="8" class="admin-empty">Belum ada penarikan pada kategori ini.</td></tr>';setMessage("adminMessage","#5ce2ae","Tidak ada penarikan pada kategori ini.");return}
- body.innerHTML=filteredRows.map(r=>`<tr>
- <td>${safe(pmap[r.user_id]||r.user_id)}</td><td><b>${rupiah(r.amount)}</b></td><td>${safe(r.method)}</td><td>${safe(r.destination)}</td><td>${safe(fmtDate(r.created_at))}</td>
- <td><select id="wstatus_${r.id}"><option value="pending" ${withdrawStatusType(r.status)==="pending"?"selected":""}>Menunggu</option><option value="success" ${withdrawStatusType(r.status)==="success"?"selected":""}>Transfer berhasil</option><option value="rejected" ${withdrawStatusType(r.status)==="rejected"?"selected":""}>Ditolak</option></select></td>
- <td><textarea id="wnote_${r.id}" placeholder="Catatan...">${safe(r.admin_note||"")}</textarea></td><td><button class="admin-save" onclick="simpanWithdrawAdmin(${Number(r.id)})">Simpan</button></td>
- </tr>`).join("");
- setMessage("adminMessage","#5ce2ae","Data penarikan berhasil dimuat.");
+ const filteredRows=adminWithdrawFilter==="all"?rows:rows.filter(x=>withdrawStatusType(x.status)===adminWithdrawFilter);
+ const wrap=document.getElementById("adminWithdrawGroups");
+ if(!wrap)return;
+ if(!filteredRows.length){wrap.innerHTML='<div class="admin-empty">Belum ada penarikan pada kategori ini.</div>';setMessage("adminMessage","#5ce2ae","Tidak ada penarikan pada kategori ini.");return}
+ const groups=new Map();
+ filteredRows.forEach(r=>{
+   const key=r.user_id||"unknown";
+   if(!groups.has(key))groups.set(key,[]);
+   groups.get(key).push(r);
+ });
+ const sortedGroups=[...groups.entries()].sort((a,b)=>String(pmap[a[0]]?.email||a[0]).localeCompare(String(pmap[b[0]]?.email||b[0])));
+ wrap.innerHTML=sortedGroups.map(([userId,list],idx)=>{
+   const profile=pmap[userId]||{};
+   const email=profile.email||userId||"Tidak diketahui";
+   const currentBalance=Number(profile.saldo||0);
+   const p=list.filter(r=>withdrawStatusType(r.status)==="pending").length;
+   const ok=list.filter(r=>withdrawStatusType(r.status)==="success").length;
+   const rej=list.filter(r=>withdrawStatusType(r.status)==="rejected").length;
+   const pendingAmount=list.filter(r=>withdrawStatusType(r.status)==="pending").reduce((sum,r)=>sum+Number(r.amount||0),0);
+   const successfulAmount=list.filter(r=>withdrawStatusType(r.status)==="success").reduce((sum,r)=>sum+Number(r.amount||0),0);
+   const items=list.map(r=>{
+     const type=withdrawStatusType(r.status);
+     const label=withdrawStatusLabel(r.status);
+     return '<div class="admin-withdraw-item">'+
+       '<div class="admin-withdraw-line"><div><div class="admin-withdraw-label">Jumlah penarikan</div><div class="admin-withdraw-value">'+rupiah(Number(r.amount||0))+'</div></div><div class="admin-withdraw-amount">'+label+'</div></div>'+ 
+       '<div class="admin-withdraw-meta"><b>Metode:</b> '+safe(r.method||"—")+'<br><b>Tujuan:</b> '+safe(r.destination||"—")+'<br><b>Diajukan:</b> '+safe(fmtDate(r.created_at))+(r.processed_at?' • <b>Diproses:</b> '+safe(fmtDate(r.processed_at)):'')+'</div>'+ 
+       '<div class="admin-withdraw-actions"><label class="admin-withdraw-label">Status</label><select id="wstatus_'+Number(r.id)+'"><option value="pending" '+(type==="pending"?"selected":"")+'>Menunggu</option><option value="success" '+(type==="success"?"selected":"")+'>Transfer berhasil</option><option value="rejected" '+(type==="rejected"?"selected":"")+'>Ditolak</option></select><label class="admin-withdraw-label">Catatan</label><textarea id="wnote_'+Number(r.id)+'" placeholder="Catatan...">'+safe(r.admin_note||"")+'</textarea><button class="admin-save" onclick="simpanWithdrawAdmin('+Number(r.id)+')">Simpan perubahan</button></div>'+ 
+     '</div>';
+   }).join("");
+   return '<div class="admin-withdraw-group"><div class="admin-withdraw-head"><div class="admin-withdraw-title">📁 Folder '+(idx+1)+' — Akun penyetor:<br>'+safe(email)+'</div><div class="admin-withdraw-count">'+list.length+' penarikan</div></div><div class="admin-withdraw-body">'+
+     '<div class="admin-withdraw-balance"><div><span>Saldo user saat ini</span><b>'+rupiah(currentBalance)+'</b></div><div><span>Total penarikan berhasil</span><b>'+rupiah(successfulAmount)+'</b></div></div>'+
+     '<div class="admin-withdraw-total"><b>Ringkasan akun</b><br>Menunggu: '+rupiah(pendingAmount)+' • Berhasil: '+rupiah(successfulAmount)+'<br>Saldo di atas adalah saldo terbaru di database. Saat pengajuan dibuat, sistem sudah mengurangi saldo yang ditarik; jika pengajuan ditolak, saldo dikembalikan oleh sistem.</div>'+
+     '<div class="admin-withdraw-summary"><div><span>Menunggu</span><b class="status-pending">'+p+'</b></div><div><span>Berhasil</span><b class="status-success">'+ok+'</b></div><div><span>Ditolak</span><b class="status-rejected">'+rej+'</b></div></div>'+items+'</div></div>';
+ }).join("");
+ setMessage("adminMessage","#5ce2ae","Data penarikan dan saldo user berhasil dimuat.");
 }
-
 async function simpanWithdrawAdmin(id){
   if(!isAdmin){setMessage("adminMessage","#ff6b6b","Akses Admin ditolak.");return}
   const status=document.getElementById("wstatus_"+id).value;
