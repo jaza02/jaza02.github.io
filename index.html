@@ -679,7 +679,13 @@ window.kirimSemuaGmail = async function(){
  const gmailActivityText=document.getElementById("gmailActivityText");
  if(gmailActivityTitle)gmailActivityTitle.textContent=emails.length+" Gmail berhasil dikirim";
  if(gmailActivityText)gmailActivityText.textContent="Status: menunggu pemeriksaan admin • Kontak: "+wa;
- msg.style.color="#5ce2ae";msg.textContent="Berhasil mencatat "+emails.length+" Gmail. Menunggu pemeriksaan admin.";
+ msg.style.color="#5ce2ae";
+msg.textContent="Berhasil mencatat "+emails.length+" Gmail. Menunggu pemeriksaan admin.";
+
+setTimeout(()=>{
+  tutupModal("gmailModal");
+  keBeranda();
+},500);
 }
 
 function gmailStatusType(status){
