@@ -754,14 +754,20 @@ async function loadAdminGmail(){
    btn.classList.toggle("active",key===adminGmailFilter);
  });
 
- const normalized=adminGmailFilter==="all"?rows:(rows||[]).filter(r=>{
+ // Folder selalu memuat SEMUA Gmail milik akun penyetor.
+ // Filter hanya menentukan folder mana yang ditampilkan.
+ const allRows=rows||[];
+ const folderRowsByFilter=adminGmailFilter==="all"?allRows:allRows.filter(r=>{
    const s=String(r.status||"").toLowerCase();
    const t=(s==="accepted"||s==="diterima")?"accepted":(s==="rejected"||s==="ditolak")?"rejected":"pending";
    return t===adminGmailFilter;
  });
+ const visibleUserIds=new Set(folderRowsByFilter.map(r=>r.user_id||"unknown"));
+ const normalized=adminGmailFilter==="all"
+   ? allRows
+   : allRows.filter(r=>visibleUserIds.has(r.user_id||"unknown"));
 
  const summary=document.getElementById("adminGmailSummary");
- const allRows=rows||[];
  const p=allRows.filter(r=>{const s=String(r.status||"").toLowerCase();return !(s==="accepted"||s==="diterima"||s==="rejected"||s==="ditolak")}).length;
  const a=allRows.filter(r=>["accepted","diterima"].includes(String(r.status||"").toLowerCase())).length;
  const d=allRows.filter(r=>["rejected","ditolak"].includes(String(r.status||"").toLowerCase())).length;
