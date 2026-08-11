@@ -653,7 +653,7 @@ document.addEventListener("input",function(e){
  if(e.target&&e.target.id==="gmailBulkInput")updateSetoranTotal();
 });
 
-async function kirimSemuaGmail(){
+window.kirimSemuaGmail = async function(){
  if(!currentUser){bukaLogin();return}
  if(!isGmailSubmissionOpen()){
   updateGmailScheduleUI();
