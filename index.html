@@ -18,7 +18,7 @@ button{font:inherit;border:0;cursor:pointer}
 .brand h1{font-size:21px;margin:0}.brand p{margin:4px 0 0;color:#ffb66b;font-size:12px;font-weight:800;letter-spacing:1.2px}
 .account-area{margin-left:auto;display:flex;gap:7px}.account-btn{background:#14263b;border:1px solid #29425d;border-radius:20px;padding:9px 12px;color:#cbd7e5}
 .container{width:min(940px,100%);margin:auto;padding:22px 16px}
-.hero{background:linear-gradient(135deg,#122b45,#0d1829);border:1px solid #27425e;border-radius:24px;padding:25px;display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center;margin-bottom:18px}.public-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 0 18px}.public-stat{background:linear-gradient(145deg,#102c35,#0d1a2b);border:1px solid #24584e;border-radius:18px;padding:17px;text-align:center}.public-stat .kicker{font-size:11px}.public-stat .num{font-size:27px;font-weight:900;color:#58e1ad;margin-top:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.public-stat small{display:block;color:var(--muted);font-size:10px;margin-top:5px}
+.hero{background:linear-gradient(135deg,#122b45,#0d1829);border:1px solid #27425e;border-radius:24px;padding:25px;display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center;margin-bottom:18px}
 .hero h2{margin:0 0 8px;font-size:25px}.hero p{margin:0;color:var(--muted);line-height:1.5}.hero-badge{background:#173a35;color:#59e0ae;border:1px solid #236c58;padding:10px 14px;border-radius:14px;font-weight:800;white-space:nowrap}
 .grid{display:grid;grid-template-columns:1.25fr .75fr;gap:16px}.card{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:21px}.balance{background:linear-gradient(145deg,#102c35,#0d1a2b);border-color:#24584e}
 .kicker{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}.money{font-size:38px;font-weight:900;color:#58e1ad;margin:8px 0 18px}.actions{display:flex;gap:10px}.btn{display:block;text-align:center;padding:12px 15px;border-radius:13px;font-weight:800;flex:1}.primary{background:var(--red);color:white}.secondary{background:#17304b;color:#9fc0ff;border:1px solid #294b72}
@@ -41,7 +41,7 @@ button{font:inherit;border:0;cursor:pointer}
 .auth-switch{text-align:center;color:var(--muted);font-size:13px;margin-top:15px}.auth-switch button{background:none;color:#78a1ff;padding:0;font-weight:800}
 .logged-info{font-size:12px;color:#8fa0b5;margin-top:7px}
 @media(max-width:700px){.grid{grid-template-columns:1fr}.hero{grid-template-columns:1fr}.hero-badge{width:max-content}}
-@media(max-width:520px){.public-stats{gap:9px}.public-stat{padding:15px 10px}.public-stat .num{font-size:21px}.container{padding:16px 13px}.top{padding:12px}.logo{width:46px;height:46px}.envelope{width:30px;height:22px}.brand h1{font-size:17px}.brand p{font-size:10px}.account-area{gap:4px}.account-btn{font-size:11px;padding:8px 9px}.hero{padding:20px;border-radius:20px}.hero h2{font-size:22px}.card{padding:18px;border-radius:19px}.stats{gap:12px}.money{font-size:34px}.actions{flex-direction:column}.bottom-nav{bottom:9px}}
+@media(max-width:520px){.container{padding:16px 13px}.top{padding:12px}.logo{width:46px;height:46px}.envelope{width:30px;height:22px}.brand h1{font-size:17px}.brand p{font-size:10px}.account-area{gap:4px}.account-btn{font-size:11px;padding:8px 9px}.hero{padding:20px;border-radius:20px}.hero h2{font-size:22px}.card{padding:18px;border-radius:19px}.stats{gap:12px}.money{font-size:34px}.actions{flex-direction:column}.bottom-nav{bottom:9px}}
 
 .admin-btn{display:none;background:#173d35;border:1px solid #2b705e;border-radius:20px;padding:9px 12px;color:#7ff0c1;font-weight:800}.admin-table{width:100%;border-collapse:collapse;font-size:12px}.admin-table th,.admin-table td{padding:9px 7px;border-bottom:1px solid var(--line);vertical-align:top;text-align:left}.admin-table th{color:#9fc0ff;position:sticky;top:0;background:#0d1a2b}.admin-table input,.admin-table select,.admin-table textarea{width:100%;padding:8px;border-radius:8px;border:1px solid #29425d;background:#102238;color:#fff}.admin-table textarea{min-height:55px;resize:vertical}.status-pending{color:#ffb66b}.status-accepted,.status-success{color:#5ce2ae}.status-rejected{color:#ff8d98}.admin-section{margin-top:18px}.admin-scroll{overflow:auto;border:1px solid var(--line);border-radius:12px}.admin-small{font-size:11px;color:var(--muted);line-height:1.4}.admin-save{padding:8px 10px;border-radius:9px;background:#17304b;color:#9fc0ff;font-weight:800;white-space:nowrap}.admin-tabs{display:flex;gap:8px;margin-bottom:12px}.admin-tabs button{flex:1;padding:10px;border-radius:10px;background:#17304b;color:#9fc0ff}.admin-tabs button.active{background:#24584e;color:#fff}.admin-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:12px}.admin-summary div{background:#102238;border:1px solid var(--line);border-radius:12px;padding:10px}.admin-summary b{display:block;font-size:18px;margin-top:4px}.admin-empty{padding:22px;text-align:center;color:var(--muted)}
 .history-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:12px}
@@ -97,11 +97,6 @@ button{font:inherit;border:0;cursor:pointer}
   <div class="hero-badge" id="accountBadge">○ Belum masuk</div>
  </section>
 
- <section class="public-stats" aria-label="Statistik platform">
-  <div class="public-stat"><div class="kicker">Total User Aktif</div><div class="num" id="publicTotalUsers">0</div><small>Pengguna terdaftar</small></div>
-  <div class="public-stat"><div class="kicker">Total Penarikan</div><div class="num" id="publicTotalWithdrawals">Rp 0</div><small>Total pembayaran kepada user</small></div>
- </section>
-
  <section class="card notice">
   <div class="notice-icon">⏱</div>
   <div><b>Informasi penarikan saldo</b><p>Penarikan saldo tersedia setiap Selasa–Sabtu, pukul 16:00–20:00. Minggu dan Senin tidak tersedia. Pastikan data tujuan sudah benar sebelum mengajukan penarikan.</p></div>
@@ -154,10 +149,11 @@ button{font:inherit;border:0;cursor:pointer}
   </aside>
  </div>
 
- <div class="section-title"><h2>Riwayat</h2><span>Aktivitas akun</span></div>
+ <div class="section-title"><h2>Aktivitas terbaru</h2><span>Riwayat</span></div>
  <section class="card">
-  <button class="btn secondary" style="width:100%;margin-top:0" onclick="bukaRiwayatGmail()">Lihat Riwayat Gmail</button>
-  <button class="btn secondary" style="width:100%;margin-top:8px" onclick="bukaRiwayatPenarikan()">Lihat Riwayat Penarikan</button>
+  <div class="transaction"><div class="tx-icon">✉️</div><div class="tx-main"><b id="gmailActivityTitle">Belum ada pengiriman</b><small id="gmailActivityText">Aktivitas Gmail akan muncul di sini</small></div><div class="tx-value">—</div></div>
+  <div class="transaction"><div class="tx-icon">💳</div><div class="tx-main"><b id="withdrawActivityTitle">Belum ada penarikan</b><small id="withdrawActivityText">Riwayat saldo masih kosong</small></div><div class="tx-value">—</div></div>
+  <button class="btn secondary" style="width:100%;margin-top:12px" onclick="bukaRiwayatGmail()">Lihat Riwayat Gmail</button><button class="btn secondary" style="width:100%;margin-top:8px" onclick="bukaRiwayatPenarikan()">Lihat Riwayat Penarikan</button>
  </section>
 </section>
 </main>
@@ -343,23 +339,6 @@ function tutupModal(id){document.getElementById(id).style.display="none"}
 function safe(str){return String(str??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
 function fmtDate(v){if(!v)return "-";try{return new Date(v).toLocaleString("id-ID")}catch(e){return v}}
 
-async function loadPublicStats(){
- try{
-  // Statistik publik diambil melalui RPC agar pengunjung yang belum login
-  // tidak bergantung pada SELECT langsung yang bisa diblokir oleh RLS.
-  const {data,error}=await supabaseClient.rpc("get_public_platform_stats");
-  if(error)throw error;
-  const stats=Array.isArray(data)?(data[0]||{}):(data||{});
-  const userCount=Number(stats.total_users||0);
-  const totalWithdrawals=Number(stats.total_withdrawals||0);
-  const usersEl=document.getElementById("publicTotalUsers"), withdrawalsEl=document.getElementById("publicTotalWithdrawals");
-  if(usersEl)usersEl.textContent=userCount.toLocaleString("id-ID");
-  if(withdrawalsEl)withdrawalsEl.textContent=rupiah(totalWithdrawals);
- }catch(error){
-  console.warn("Gagal memuat statistik publik:",error);
- }
-}
-
 async function ensureProfile(){
  if(!currentUser)return null;
  const {data,error}=await supabaseClient.from("profiles").select("id,email,saldo,whatsapp").eq("id",currentUser.id).maybeSingle();
@@ -515,6 +494,8 @@ async function ajukanPenarikan(){
     if(rpc.error)throw rpc.error;
     msg.style.color="#5ce2ae";msg.textContent="Penarikan berhasil diajukan dan saldo telah dikurangi.";
     await loadUser();
+    document.getElementById("withdrawActivityTitle").textContent="Penarikan menunggu proses";
+    document.getElementById("withdrawActivityText").textContent=metode+" • "+rupiah(jumlah);
   }catch(error){
     console.error("ajukanPenarikan:",error);
     msg.style.color="#ff6b6b";
@@ -560,6 +541,8 @@ async function kirimSemuaGmail(){
  await supabaseClient.from("profiles").update({whatsapp:wa}).eq("id",currentUser.id);
  submitterWhatsApp=wa;
  await loadUser();
+ document.getElementById("gmailActivityTitle").textContent=emails.length+" Gmail berhasil dikirim";
+ document.getElementById("gmailActivityText").textContent="Status: menunggu pemeriksaan admin • Kontak: "+wa;
  msg.style.color="#5ce2ae";msg.textContent="Berhasil mencatat "+emails.length+" Gmail. Menunggu pemeriksaan admin.";
 }
 
@@ -718,6 +701,7 @@ async function loadAdminGmail(){
    .select("id,user_id,gmail,submitter_whatsapp,created_at,status,amount,reviewed_at,admin_note")
    .order("created_at",{ascending:false});
  if(error){setMessage("adminMessage","#ff6b6b",error.message);return}
+ window._adminGmailRows=rows||[];
 
  const filterButtons=document.querySelectorAll("#adminGmailFilters .history-filter");
  filterButtons.forEach(btn=>{
@@ -772,12 +756,17 @@ async function loadAdminGmail(){
      const type=(s==="accepted"||s==="diterima")?"accepted":(s==="rejected"||s==="ditolak")?"rejected":"pending";
      const statusLabel=type==="accepted"?"Diterima":type==="rejected"?"Ditolak":"Menunggu review";
      const statusClass=type==="accepted"?"status-accepted":type==="rejected"?"status-rejected":"status-pending";
+     const waButton=r.submitter_whatsapp
+       ? '<button class="btn small" style="background:#167b52;color:#fff" onclick="kirimSetoranKeWhatsApp('+Number(r.id)+')">📲 WhatsApp</button>'
+       : '';
      const action=(type==="pending")?
        '<div style="display:flex;gap:5px;flex-wrap:wrap">'+
        '<button class="btn small" onclick="terimaGmailAdmin('+Number(r.id)+')">Terima</button>'+
        '<button class="btn small danger" onclick="tolakGmailAdmin('+Number(r.id)+')">Tolak</button>'+
+       waButton+
        '</div>':
-       '<span class="admin-small">Sudah diproses</span>';
+       '<div style="display:flex;gap:5px;flex-wrap:wrap">'+
+       '<span class="admin-small">Sudah diproses</span>'+waButton+'</div>';
      return '<tr>'+
        '<td><b>'+safe(r.gmail)+'</b></td>'+
        '<td>'+safe(r.submitter_whatsapp||"—")+'</td>'+
@@ -793,6 +782,51 @@ async function loadAdminGmail(){
      '<div class="admin-scroll"><table class="admin-user-group-table"><thead><tr><th>Gmail</th><th>WhatsApp</th><th>Tanggal</th><th>Status</th><th>Nominal</th><th>Catatan</th><th>Aksi</th></tr></thead><tbody>'+rowsHtml+'</tbody></table></div>'+
      '</div>';
  }).join("");
+}
+
+
+
+function kirimSetoranKeWhatsApp(id){
+  if(!isAdmin){
+    alert("Akses Admin ditolak.");
+    return;
+  }
+
+  const rows=window._adminGmailRows||[];
+  const row=rows.find(r=>Number(r.id)===Number(id));
+  if(!row){
+    alert("Data setoran tidak ditemukan. Silakan refresh Panel Admin.");
+    return;
+  }
+
+  const phone=String(row.submitter_whatsapp||"").replace(/[^0-9]/g,"");
+  if(!phone){
+    alert("Nomor WhatsApp penyetor belum tersedia.");
+    return;
+  }
+
+  let wa=phone;
+  if(wa.startsWith("0"))wa="62"+wa.slice(1);
+  if(!wa.startsWith("62")){
+    alert("Nomor WhatsApp harus menggunakan nomor Indonesia, contoh 08xxxxxxxxxx.");
+    return;
+  }
+
+  const email=row.gmail||"-";
+  const status=String(row.status||"pending").toLowerCase();
+  const statusLabel=(status==="accepted"||status==="diterima")?"Diterima":(status==="rejected"||status==="ditolak")?"Ditolak":"Menunggu pemeriksaan";
+  const message=[
+    "🔔 SETORAN GMAIL",
+    "",
+    "Gmail: "+email,
+    "Jumlah: 1 Gmail",
+    "Penyetor: "+(row.submitter_whatsapp||"-"),
+    "Waktu: "+fmtDate(row.created_at),
+    "Status: "+statusLabel,
+    row.amount ? "Nominal: "+rupiah(Number(row.amount)) : ""
+  ].filter(Boolean).join("\n");
+
+  window.open("https://wa.me/"+wa+"?text="+encodeURIComponent(message),"_blank");
 }
 
 async function terimaGmailAdmin(id){
@@ -939,9 +973,7 @@ supabaseClient.auth.onAuthStateChange((event,session)=>{
  if(event==="SIGNED_IN"||event==="SIGNED_OUT"||event==="TOKEN_REFRESHED")loadUser();
 });
 
-loadPublicStats();
 loadUser();
-setInterval(loadPublicStats,30000);
 </script>
 </body>
 </html>
