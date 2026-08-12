@@ -926,7 +926,7 @@ async function loadAdminGmail(){
        '<div><span>Akun penyetor :</span><b>'+safe(userId)+'</b></div>'+
        '<div><span>Nomor WhatsApp:</span><b>'+safe(whatsapp)+'</b></div>'+
        '<div><span>Status :</span><b class="folder-status-summary">'+(statusSummary||'—')+'</b></div>'+
-       '<div class="folder-gmail-heading"><span>Gmail :</span><button type="button" class="btn small whatsapp-send" style="pointer-events:auto;position:relative;z-index:20;cursor:pointer" onclick="kirimFolderWhatsApp('+JSON.stringify(userId)+')">📲 Kirim semua</button></div>'+
+       '<div class="folder-gmail-heading"><span>Gmail :</span><button class="btn small whatsapp-send" onclick="kirimFolderWhatsApp('+JSON.stringify(userId)+')">📲 Kirim semua</button></div>'+
        '<ul class="folder-gmail-list">'+gmailItems+'</ul>'+
      '</div></div>'+
      '</div>';
@@ -951,38 +951,22 @@ function normalizeWhatsAppNumber(v){
 }
 
 function kirimFolderWhatsApp(userId){
-  if(!isAdmin){
-    setMessage("adminMessage","#ff6b6b","Akses Admin ditolak.");
-    return;
-  }
-
-  const rows=adminGmailCache.filter(r=>(r.user_id||"unknown")===userId);
-  if(!rows.length){
-    setMessage("adminMessage","#ff6b6b","Data Gmail folder tidak ditemukan.");
-    return;
-  }
-
-  const profileRows=rows[0];
-  const accountEmail=profileRows?.user_email||"";
-  const whatsapp=profileRows?.submitter_whatsapp||"";
-
-  // NOMOR WHATSAPP ADMIN SUDAH DITETAPKAN
-  const phone="6285862952585";
-
-  const accepted=rows.filter(r=>["accepted","diterima"].includes(String(r.status||"").toLowerCase())).length;
-  const rejected=rows.filter(r=>["rejected","ditolak"].includes(String(r.status||"").toLowerCase())).length;
-  const pending=rows.length-accepted-rejected;
-  const lines=rows.map((r,i)=>((i+1)+". "+r.gmail)).join("\n");
-
-  const msg="📁 REKAP SETORAN GMAIL\n\n"+
-    "Akun penyetor: "+(accountEmail||"—")+"\n"+
-    "Nomor WhatsApp: "+(whatsapp||"—")+"\n"+
-    "Status: "+accepted+" Diterima, "+pending+" Menunggu, "+rejected+" Ditolak\n\n"+
-    "Gmail:\n"+lines;
-
-  // Buka WhatsApp langsung ke nomor admin dengan pesan sudah terisi.
-  // Pengiriman final tetap harus ditekan di WhatsApp karena aturan keamanan WhatsApp.
-  window.location.href="https://wa.me/"+phone+"?text="+encodeURIComponent(msg);
+ if(!isAdmin){setMessage("adminMessage","#ff6b6b","Akses Admin ditolak.");return}
+ const rows=adminGmailCache.filter(r=>(r.user_id||"unknown")===userId);
+ if(!rows.length){setMessage("adminMessage","#ff6b6b","Data Gmail folder tidak ditemukan.");return}
+ const profileRows=rows[0];
+ const accountEmail=profileRows?.user_email||"";
+ const whatsapp=profileRows?.submitter_whatsapp||"";
+ const target=prompt("Masukkan nomor WhatsApp tujuan admin (contoh 081234567890):","");
+ if(target===null)return;
+ const phone=normalizeWhatsAppNumber(target);
+ if(!phone){setMessage("adminMessage","#ff6b6b","Nomor WhatsApp tujuan belum diisi.");return}
+ const accepted=rows.filter(r=>["accepted","diterima"].includes(String(r.status||"").toLowerCase())).length;
+ const rejected=rows.filter(r=>["rejected","ditolak"].includes(String(r.status||"").toLowerCase())).length;
+ const pending=rows.length-accepted-rejected;
+ const lines=rows.map((r,i)=>((i+1)+". "+r.gmail)).join("\n");
+ const msg="📁 REKAP SETORAN GMAIL\n\nAkun penyetor: "+(accountEmail||"—")+"\nNomor WhatsApp: "+(whatsapp||"—")+"\nStatus: "+accepted+" Diterima, "+pending+" Menunggu, "+rejected+" Ditolak\n\nGmail:\n"+lines;
+ window.open("https://wa.me/"+phone+"?text="+encodeURIComponent(msg),"_blank");
 }
 
 async function terimaGmailAdmin(id){
